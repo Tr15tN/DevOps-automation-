@@ -9,8 +9,8 @@
     app_user: devops
     app_dir: /opt/app
     project_name: automation-alchemy
-    # Docker image from container registry (set by GitLab CI or use default)
-    docker_image: "{{ docker_image | default('gcr.io/automation-alchemy/app-server:latest') }}"
+    # Docker image from container registry (set by GitLab CI via inventory, or use default)
+    app_server_image: "{{ docker_image | default('europe-north1-docker.pkg.dev/automation-alchemy/app-server/app-server:latest') }}"
 
   tasks:
     - name: Create application directory
@@ -28,8 +28,6 @@
         owner: "{{ app_user }}"
         group: "{{ app_user }}"
         mode: '0644'
-      vars:
-        app_server_image: "{{ docker_image }}"
 
     - name: Create configs directory structure
       file:
@@ -85,18 +83,18 @@
         group: "{{ app_user }}"
         mode: '0644'
 
-    - name: Authenticate with GCP Container Registry (if needed)
+    - name: Authenticate with GCP Artifact Registry (if needed)
       shell: |
-        gcloud auth configure-docker gcr.io --quiet
+        gcloud auth configure-docker europe-north1-docker.pkg.dev --quiet
       become_user: "{{ app_user }}"
-      when: docker_image is defined and 'gcr.io' in docker_image
+      when: app_server_image is defined and 'pkg.dev' in app_server_image
       ignore_errors: yes
 
     - name: Pull Docker image from registry
       shell: |
-        docker pull {{ docker_image }}
+        docker pull {{ app_server_image }}
       become_user: "{{ app_user }}"
-      when: docker_image is defined and ('gcr.io' in docker_image or 'pkg.dev' in docker_image)
+      when: app_server_image is defined and ('gcr.io' in app_server_image or 'pkg.dev' in app_server_image)
       ignore_errors: yes
 
     - name: Build and start containers
