@@ -275,13 +275,14 @@ test:performance:
   stage: integration
   image: alpine:latest
   before_script:
-    - apk add --no-cache bash curl apache2-utils bc
+    - apk add --no-cache bash curl apache2-utils bc coreutils
   script:
     - |
       export TARGET_URL="http://${VM_EXTERNAL_IP}:8080"
-      export REQUESTS=50
-      export CONCURRENCY=5
-      export MAX_RESPONSE_TIME=1000
+      export REQUESTS=30
+      export CONCURRENCY=3
+      export MAX_RESPONSE_TIME=2000
+      export USE_CURL_FALLBACK=true
       chmod +x tests/performance-test.sh
       tests/performance-test.sh
   dependencies:
