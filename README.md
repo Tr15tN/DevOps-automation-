@@ -1,601 +1,387 @@
-# Infrastructure Insight 🧐
+# Automation Alchemy 🔮
 
 ## 🚀 Project Overview
 
-**Infrastructure Insight** is a comprehensive DevOps infrastructure project demonstrating modern containerization, load balancing, and infrastructure monitoring. This project implements a diagnostic application deployed across a multi-server architecture with HAProxy load balancing, NGINX web servers, and a Node.js backend API.
+**Automation Alchemy** is a comprehensive DevOps automation project demonstrating Infrastructure as Code (IaC), configuration management, and CI/CD pipeline implementation. This project automates the deployment of a multi-server infrastructure on Google Cloud Platform, transforming manual processes into fully automated workflows.
 
 ### Key Features
 
-- 🐳 **Containerized Infrastructure**: Docker-based deployment with Docker Compose orchestration
-- ⚖️ **Load Balancing**: HAProxy with multiple algorithms (round-robin, weighted, least-connection)
-- 🌐 **Web Servers**: Two NGINX instances serving frontend and proxying API requests
-- 📊 **Real-time Metrics**: Backend API providing system diagnostics (CPU, memory, OS info)
-- 🎨 **Modern UI**: Responsive, animated frontend with dark theme
-- 🔒 **Security**: Firewall configuration scripts for production deployment
-- 💾 **Backup System**: Automated backup and restore scripts for critical data
-- 📈 **Monitoring**: Netdata integration for real-time system monitoring
+- 🏗️ **Infrastructure as Code**: Terraform for automated VM provisioning
+- ⚙️ **Configuration Management**: Ansible for server configuration and hardening
+- 🔁 **CI/CD Pipeline**: GitLab CI for automated deployments
+- ☁️ **Cloud Infrastructure**: Google Cloud Platform (GCP) with free tier optimization
+- 🐳 **Containerized Applications**: Docker-based application deployment
+- 🔒 **Security**: Automated hardening, firewall rules, and best practices
+- 📊 **Monitoring**: System monitoring and health checks
+- 🎯 **One-Click Deployment**: Single command to deploy entire infrastructure
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐
-│   Load Balancer │  HAProxy (port 8080)
-│    (HAProxy)    │  Stats: port 8404
-└────────┬────────┘
-         │ Round-robin / Weighted / Least-conn
-    ┌────┴────┐
-    ▼         ▼
-┌────────┐ ┌────────┐
-│ NGINX  │ │ NGINX  │  Web Servers (ports 8081, 8082)
-│ Web #1 │ │ Web #2 │  Serve frontend + proxy /api/*
-└───┬────┘ └───┬────┘
-    └──────┬───┘
-           ▼
-    ┌──────────┐
-    │ Node.js  │          App Server (port 3000)
-    │ Backend  │          /api/metrics endpoint
-    └──────────┘
+┌─────────────────────────────────────────────────┐
+│         ONE-CLICK AUTOMATION SCRIPT             │
+│  (Terraform → Ansible → GitLab CI → Deploy)     │
+└─────────────────────────────────────────────────┘
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+┌──────────────┐        ┌──────────────┐
+│  Terraform   │        │   Ansible    │
+│  (Provision) │──────▶ │ (Configure)  │
+└──────────────┘        └──────────────┘
+        │                       │
+        ▼                       ▼
+┌─────────────────────────────────────────┐
+│         GCP Cloud Infrastructure        │
+│  ┌──────────┐  ┌──────────┐            │
+│  │ Load Bal │  │ Web #1   │            │
+│  │  (VM)    │  │  (VM)    │            │
+│  └────┬─────┘  └────┬─────┘            │
+│       │             │                   │
+│  ┌────┴─────┐  ┌────┴─────┐            │
+│  │ Web #2   │  │ App      │            │
+│  │  (VM)    │  │  (VM)    │            │
+│  └──────────┘  └──────────┘            │
+│                                        │
+│  ┌──────────┐                         │
+│  │ Jenkins │                         │
+│  │  (VM)   │                         │
+│  └──────────┘                         │
+└─────────────────────────────────────────┘
+        │
+        ▼
+┌─────────────────────────────────────────┐
+│      Containers (on each VM)           │
+│  (HAProxy, NGINX, Node.js, Netdata)    │
+└─────────────────────────────────────────┘
 ```
 
-### Container Services
+### Current Setup (Phase 1 Complete)
 
-| Service | Image | Ports | Purpose |
-|---------|-------|-------|---------|
-| **load-balancer** | haproxy:2.8-alpine | 8080:80, 8404:8404 | Traffic distribution |
-| **web-server-1** | nginx:1.25-alpine | 8081:80 | Frontend + API proxy |
-| **web-server-2** | nginx:1.25-alpine | 8082:80 | Frontend + API proxy |
-| **app-server** | Custom Node.js | 3000:3000 | Metrics API backend |
-| **netdata** | netdata/netdata | 19999:19999 | System monitoring |
+- **Region**: `europe-north1` (Finland) - Optimized for Estonia
+- **VM Count**: 1 (configurable: 1, 4, or 5)
+- **Machine Type**: `e2-micro` (Free tier eligible)
+- **Cost**: $0/month (using free tier)
 
 ---
 
 ## 📋 Prerequisites
 
-- **Docker Desktop** (Windows/Mac) or **Docker Engine** (Linux) v20.10+
-- **Docker Compose** v2.0+
-- **Git** for cloning the repository
-- **8GB+ RAM** recommended
-- **10GB+ free disk space**
+- **Terraform** v1.5.0+ ([Installation Guide](docs/INSTALLATION_GUIDE.md))
+- **gcloud CLI** (for GCP authentication)
+- **Git** for version control
+- **GCP Account** with project created ([Setup Guide](docs/GCP_BEGINNER_SETUP.md))
+- **SSH Key** (will be generated if missing)
 
-For production VM deployment:
-- Ubuntu 20.04+ or Debian 11+
-- `curl`, `wget`, `rsync` (for backup scripts)
-- Root or sudo access
+For Phase 2+:
+- **Ansible** (for configuration management)
+- **GitLab Account** (for CI/CD)
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone the Repository
+### Phase 1: Infrastructure Provisioning (✅ Complete)
+
+1. **Set up GCP Account**
+   ```bash
+   # Follow: docs/GCP_BEGINNER_SETUP.md
+   ```
+
+2. **Configure Terraform**
+   ```bash
+   cd terraform
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your project_id
+   ```
+
+3. **Authenticate with GCP**
+   ```bash
+   gcloud auth login
+   gcloud auth application-default login
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+4. **Deploy Infrastructure**
+   ```bash
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+
+5. **Get VM Information**
+   ```bash
+   terraform output
+   ```
+
+### Access Your VM
 
 ```bash
-git clone <your-repository-url>
-cd server-sorcery-101
-```
+# SSH into the VM
+ssh devops@<EXTERNAL_IP>
 
-### 2. Start the Infrastructure
-
-```bash
-docker-compose up -d
-```
-
-### 3. Verify All Services
-
-```bash
-docker-compose ps
-```
-
-Expected output: All services showing `Up (healthy)`
-
-### 4. Access the Application
-
-- **Main Application (Load Balanced)**: http://localhost:8080
-- **Web Server 1 (Direct)**: http://localhost:8081
-- **Web Server 2 (Direct)**: http://localhost:8082
-- **App Server API**: http://localhost:3000/api/metrics
-- **HAProxy Stats**: http://localhost:8404/stats
-- **Netdata Monitoring**: http://localhost:19999
-
----
-
-## 📊 Application Features
-
-### Frontend (`/`)
-
-The responsive frontend displays real-time infrastructure metrics:
-
-- **Host Information**: Hostname, OS type, architecture
-- **CPU Metrics**: Core count, model, usage percentage, load averages
-- **Memory Usage**: Total, used, free memory with percentage
-- **Server Identification**: Shows which NGINX web server responded
-- **Responsive Design**: Works on desktop, tablet, and mobile
-- **Smooth Animations**: Subtle fade-in effects for better UX
-
-### Backend API (`/api/metrics`)
-
-The Node.js backend provides a comprehensive metrics endpoint:
-
-```json
-{
-  "server": "app-server",
-  "hostname": "abc123def456",
-  "os": {
-    "platform": "linux",
-    "arch": "x64",
-    "release": "5.15.0"
-  },
-  "cpu": {
-    "cores": 8,
-    "model": "Intel(R) Core(TM) i7-9700K",
-    "speedMHz": 3600,
-    "usagePercent": 23.45,
-    "loadAverage": { "1m": 1.2, "5m": 0.9, "15m": 0.7 }
-  },
-  "memory": {
-    "totalBytes": 16777216000,
-    "freeBytes": 8388608000,
-    "usedBytes": 8388608000,
-    "usedPercent": 50.00
-  },
-  "network": {
-    "interfaces": { /* Network interface details */ }
-  },
-  "timestamp": "2025-10-30T12:34:56.789Z"
-}
+# Get IP from Terraform output
+terraform output vm_instances
 ```
 
 ---
 
-## ⚖️ Load Balancing Algorithms
+## 📊 Project Status
 
-HAProxy supports multiple load balancing strategies. Edit `configs/haproxy/haproxy.cfg` to switch:
+### ✅ Phase 1: Infrastructure as Code (Terraform) - COMPLETE
 
-### 1. Round Robin (Default)
+- [x] Terraform configuration created
+- [x] GCP infrastructure provisioned
+- [x] VPC, subnet, firewall rules configured
+- [x] VM instance running in Europe (europe-north1)
+- [x] SSH access configured
+- [x] Cost optimized (free tier)
 
-Distributes requests evenly across all servers.
+**Current VM**: `automation-alchemy` at `34.88.104.254` (europe-north1-a)
 
-```haproxy
-backend be_web
-    balance roundrobin
-    server web1 web-server-1:80 check
-    server web2 web-server-2:80 check
-```
+### 🚧 Phase 2: Configuration Management (Ansible) - IN PROGRESS
 
-### 2. Weighted Round Robin
+- [ ] Ansible playbooks created
+- [ ] Docker installation automated
+- [ ] Firewall configuration automated
+- [ ] Security hardening automated
+- [ ] Application deployment automated
 
-Gives more traffic to servers with higher weights (useful for unequal hardware).
+### 📋 Phase 3: CI/CD Pipeline (GitLab CI) - PLANNED
 
-```haproxy
-backend be_web
-    balance roundrobin
-    server web1 web-server-1:80 check weight 3
-    server web2 web-server-2:80 check weight 1
-```
+- [ ] GitLab project setup
+- [ ] CI/CD pipeline configuration
+- [ ] Automated testing integration
+- [ ] Deployment automation
+- [ ] Rollback capability
 
-*Server 1 receives 75% of traffic, Server 2 receives 25%*
+### 📋 Phase 4-7: Testing, Alerts, Rollback, One-Click - PLANNED
 
-### 3. Least Connection
-
-Routes to the server with the fewest active connections.
-
-```haproxy
-backend be_web
-    balance leastconn
-    server web1 web-server-1:80 check
-    server web2 web-server-2:80 check
-```
-
-**To apply changes:**
-
-```bash
-docker-compose restart load-balancer
-```
-
----
-
-## 🛠️ Server Setup for Production
-
-### Installing Docker
-
-Run the installation script on each server:
-
-```bash
-chmod +x scripts/install_docker.sh
-./scripts/install_docker.sh
-```
-
-This script:
-- Installs Docker Engine and Docker Compose plugin
-- Adds current user to `docker` group
-- Configures Docker to start on boot
-
-**Note**: Log out and back in for group membership to take effect.
-
-### Configuring Firewall
-
-Secure your servers with UFW firewall:
-
-```bash
-chmod +x scripts/configure_firewall.sh
-sudo ./scripts/configure_firewall.sh
-```
-
-This opens necessary ports:
-- **22**: SSH
-- **8080**: Load balancer
-- **8404**: HAProxy stats
-- **8081, 8082**: Web servers (optional, for debugging)
-- **3000**: App server API (optional, for debugging)
-- **19999**: Netdata monitoring
-
-### Deploying Containers
-
-1. Transfer project files to each server:
-
-```bash
-rsync -avz --exclude 'node_modules' --exclude '.git' \
-  ./ user@server-ip:/opt/infrastructure-insight/
-```
-
-2. SSH into the server and start services:
-
-```bash
-ssh user@server-ip
-cd /opt/infrastructure-insight
-docker-compose up -d
-```
-
----
-
-## 💾 Backup and Restore
-
-### Setting Up Backup VM
-
-1. **Transfer scripts to backup server:**
-
-```bash
-scp scripts/backup/*.sh backup-user@backup-server:/opt/backups/
-```
-
-2. **Test backup manually:**
-
-```bash
-ssh backup-user@backup-server
-cd /opt/backups
-chmod +x backup.sh restore.sh
-
-# Backup from app server
-./backup.sh devops@app-server-ip:/ /backups/app-server
-```
-
-### Automated Weekly Backups
-
-Add to crontab on the backup server:
-
-```bash
-crontab -e
-```
-
-Insert:
-
-```cron
-# Weekly full backup every Sunday at 3 AM
-0 3 * * 0 /opt/backups/backup.sh devops@10.0.0.10:/ /backups/server-01 >> /var/log/backup.log 2>&1
-0 3 * * 0 /opt/backups/backup.sh devops@10.0.0.11:/ /backups/server-02 >> /var/log/backup.log 2>&1
-```
-
-### Restoring from Backup
-
-```bash
-# List available backups
-ls -lh /backups/server-01/
-
-# Restore specific backup
-./restore.sh /backups/server-01/full-2025-10-30 10.0.0.10 devops
-```
-
-**⚠️ Warning**: Restore operations overwrite existing files. Test in staging first.
-
----
-
-## 🧪 Testing and Validation
-
-### Test Load Balancing
-
-```bash
-# Make multiple requests and observe server rotation
-for i in {1..10}; do
-  curl -s http://localhost:8080/health
-  echo ""
-done
-```
-
-You should see responses alternating between `OK web-server-1` and `OK web-server-2`.
-
-### Test Metrics Endpoint
-
-```bash
-curl http://localhost:8080/api/metrics | jq
-```
-
-### Monitor HAProxy Stats
-
-Visit http://localhost:8080/stats to see:
-- Active connections per server
-- Request rate
-- Server health status
-- Session information
-
-### Health Checks
-
-```bash
-# Check all container health
-docker-compose ps
-
-# Individual service health
-curl http://localhost:8080/health
-curl http://localhost:3000/health
-```
-
----
-
-## 🔧 Configuration Files
-
-### Key Configuration Locations
-
-| File | Purpose |
-|------|---------|
-| `docker-compose.yml` | Container orchestration |
-| `configs/haproxy/haproxy.cfg` | Load balancer settings |
-| `configs/nginx/nginx1.conf` | Web server 1 configuration |
-| `configs/nginx/nginx2.conf` | Web server 2 configuration |
-| `docker/app-server/Dockerfile` | App server image build |
-| `docker/app-server/server.js` | Backend API logic |
-| `web-content/index.html` | Frontend application |
-
-### Customizing the Backend
-
-Edit `docker/app-server/server.js` to add new metrics or endpoints:
-
-```javascript
-app.get('/api/custom', async (req, res) => {
-  // Your custom logic
-  res.json({ custom: 'data' });
-});
-```
-
-Rebuild and restart:
-
-```bash
-docker-compose up -d --build app-server
-```
-
-### Customizing the Frontend
-
-Edit `web-content/index.html` to modify UI, add charts, or change styling.
-
-Changes are reflected immediately (no rebuild needed):
-
-```bash
-docker-compose restart web-server-1 web-server-2
-```
-
----
-
-## 📈 Monitoring with Netdata
-
-Access the Netdata dashboard at http://localhost:19999 to monitor:
-
-- **CPU Usage**: Per-core utilization, temperature, frequency
-- **Memory**: RAM usage, swap, cache
-- **Disk I/O**: Read/write operations, IOPS
-- **Network**: Bandwidth, packet rates, errors
-- **Containers**: Per-container resource usage
-- **Applications**: Process-level metrics
-
-### Key Netdata Features
-
-- Real-time charts (1-second granularity)
-- Historical data retention
-- Alerts and notifications
-- Performance insights
-
----
-
-## 🐛 Troubleshooting
-
-### Containers Won't Start
-
-```bash
-# Check logs
-docker-compose logs app-server
-docker-compose logs web-server-1
-
-# Check Docker daemon
-docker info
-
-# Rebuild from scratch
-docker-compose down -v
-docker-compose up -d --build
-```
-
-### Port Already in Use
-
-```bash
-# Find process using port 8080
-sudo lsof -i :8080
-# or
-sudo netstat -tulpn | grep 8080
-
-# Kill the process or change port in docker-compose.yml
-```
-
-### Health Checks Failing
-
-```bash
-# Enter container to debug
-docker-compose exec app-server sh
-
-# Test endpoint from inside container
-curl http://localhost:3000/health
-
-# Check logs for errors
-docker-compose logs -f app-server
-```
-
-### Load Balancer Not Distributing Traffic
-
-1. Check HAProxy stats: http://localhost:8404/stats
-2. Verify both web servers show as "UP"
-3. Check NGINX health: `curl http://localhost:8081/health`
-4. Review HAProxy logs: `docker-compose logs load-balancer`
-
-### Metrics Endpoint Returns Null CPU Usage
-
-This is expected behavior if CPU sampling times out (1.5s). The endpoint returns other metrics successfully. This prevents the request from hanging indefinitely.
+See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed status.
 
 ---
 
 ## 📁 Project Structure
 
 ```
-server-sorcery-101/
-├── docker-compose.yml              # Main orchestration file
-├── README.md                       # This file
-├── docker/
-│   └── app-server/
-│       ├── Dockerfile              # Backend container definition
-│       ├── package.json            # Node.js dependencies
-│       └── server.js               # Express API server
-├── configs/
-│   ├── haproxy/
-│   │   └── haproxy.cfg             # Load balancer config
-│   └── nginx/
-│       ├── nginx1.conf             # Web server 1 config
-│       └── nginx2.conf             # Web server 2 config
-├── web-content/
-│   └── index.html                  # Frontend application
-├── scripts/
-│   ├── install_docker.sh           # Docker installation script
-│   ├── configure_firewall.sh       # UFW firewall setup
-│   └── backup/
-│       ├── backup.sh               # Weekly backup script
-│       └── restore.sh              # Restore from backup
-└── docs/                           # Additional documentation
+automation-alchemy/
+├── README.md                    # This file
+├── terraform/                   # Infrastructure as Code
+│   ├── main.tf                 # Main infrastructure resources
+│   ├── variables.tf            # Input variables
+│   ├── outputs.tf              # Output values (for Ansible)
+│   ├── versions.tf            # Provider versions
+│   └── terraform.tfvars        # Your configuration
+│
+├── ansible/                    # Configuration Management (Phase 2)
+│   ├── playbooks/              # Ansible playbooks
+│   └── inventory/              # VM inventory
+│
+├── jenkins/                    # CI/CD (Phase 3)
+│   └── Jenkinsfile            # Pipeline definition
+│
+├── docker/                     # Application code
+│   └── app-server/            # Node.js backend
+│
+├── configs/                    # Service configurations
+│   ├── haproxy/               # Load balancer config
+│   └── nginx/                 # Web server configs
+│
+├── web-content/                # Frontend application
+│   └── index.html
+│
+├── scripts/                    # Automation scripts
+│   ├── install_docker.sh      # Docker installation
+│   ├── configure_firewall.sh  # Firewall setup
+│   └── backup/                # Backup scripts
+│
+└── docs/                       # Documentation
+    ├── what-and-why/          # What we did and why
+    ├── INSTALLATION_GUIDE.md   # Tool installation
+    └── GCP_BEGINNER_SETUP.md   # GCP setup guide
 ```
 
 ---
 
-## 🎯 Learning Outcomes
+## 🛠️ Technology Stack
 
-By working with this project, you'll learn:
-
-1. **Containerization**: Docker image building, multi-container orchestration
-2. **Load Balancing**: HAProxy configuration, algorithm comparison
-3. **Web Servers**: NGINX reverse proxy, static content serving
-4. **Backend Development**: Node.js/Express API, async patterns
-5. **Frontend Development**: Responsive UI, REST API consumption
-6. **DevOps Practices**: Automation, monitoring, backup strategies
-7. **Networking**: Container networking, service discovery, health checks
-8. **Security**: Firewall configuration, production hardening
+| Component | Technology | Status |
+|-----------|-----------|--------|
+| **Infrastructure** | Terraform + GCP | ✅ Complete |
+| **Configuration** | Ansible | 🚧 In Progress |
+| **CI/CD** | GitLab CI | 📋 Planned |
+| **Cloud Provider** | Google Cloud Platform | ✅ Complete |
+| **Containerization** | Docker | 📋 Planned |
+| **Load Balancer** | HAProxy | 📋 Planned |
+| **Web Server** | NGINX | 📋 Planned |
+| **Backend** | Node.js + Express | ✅ Ready |
+| **Monitoring** | Netdata | 📋 Planned |
 
 ---
 
-## 🚀 Deployment Workflow
+## 💰 Cost Management
 
-### Development
+### Current Setup (Free Tier)
+
+- **1x e2-micro VM**: FREE (free tier)
+- **30GB disk**: FREE (free tier)
+- **VPC/Networking**: FREE
+- **Total**: **$0/month** ✅
+
+### Scaling Options
+
+- **4 VMs**: ~$21/month (1 free + 3 paid)
+- **5 VMs**: ~$28/month (1 free + 4 paid)
+
+**Note**: With $300 GCP credit, you get ~14 months free!
+
+See [Cost Optimization Strategy](docs/COST_OPTIMIZATION_STRATEGY.md) for details.
+
+---
+
+## 📚 Documentation
+
+### Quick Links
+
+- **New to cloud?** → [GCP Beginner Setup](docs/GCP_BEGINNER_SETUP.md)
+- **Want to understand decisions?** → [What and Why](docs/what-and-why/)
+- **Need installation help?** → [Installation Guide](docs/INSTALLATION_GUIDE.md)
+- **Check progress?** → [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md)
+
+### Key Documents
+
+- [Terraform Setup](docs/what-and-why/TERRAFORM_SETUP.md) - Complete infrastructure explanation
+- [Architecture Decisions](docs/what-and-why/ARCHITECTURE_DECISIONS.md) - Why we chose what we did
+- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) - Step-by-step plan
+- [Future Project Analysis](docs/FUTURE_PROJECT_ANALYSIS.md) - How this prepares for next project
+
+---
+
+## 🔧 Configuration
+
+### Terraform Variables
+
+Edit `terraform/terraform.tfvars`:
+
+```hcl
+project_id = "your-gcp-project-id"
+region     = "europe-north1"      # Optimized for Estonia
+zone       = "europe-north1-a"
+vm_count   = 1                     # 1 = free tier, 4-5 = full setup
+```
+
+### VM Configuration
+
+- **Machine Type**: `e2-micro` (free tier)
+- **Disk Size**: 30GB (free tier)
+- **OS**: Ubuntu 22.04 LTS
+- **SSH User**: `devops`
+
+---
+
+## 🧪 Testing
+
+### Verify Infrastructure
 
 ```bash
-# Start services
-docker-compose up
+# Check Terraform state
+cd terraform
+terraform show
 
-# View logs
-docker-compose logs -f
+# Get VM IPs
+terraform output vm_instances
 
-# Stop services
-docker-compose down
+# Test SSH access
+ssh devops@<EXTERNAL_IP>
 ```
 
-### Production
+### Verify VM Status
 
 ```bash
-# Build and start in detached mode
-docker-compose up -d --build
+# In GCP Console
+https://console.cloud.google.com/compute/instances
 
-# Verify health
-docker-compose ps
-curl http://localhost:8080/health
-
-# Monitor logs
-docker-compose logs -f --tail=100
-
-# Update application
-git pull
-docker-compose up -d --build app-server
-
-# Rolling restart
-docker-compose restart web-server-1
-sleep 5
-docker-compose restart web-server-2
+# Or via gcloud
+gcloud compute instances list
 ```
 
 ---
 
-## 🔐 Security Considerations
+## 🐛 Troubleshooting
 
-### Current Implementation
+### Terraform Issues
 
-- ✅ Non-root container execution
-- ✅ Health checks for reliability
-- ✅ Resource limits (in docker-compose)
-- ✅ Firewall configuration scripts
-- ✅ Read-only config mounts
+**Error: "API not enabled"**
+```bash
+gcloud services enable compute.googleapis.com
+```
 
-### Production Enhancements
+**Error: "Permission denied"**
+```bash
+gcloud auth application-default login
+```
 
-For production deployment, consider adding:
+**Error: "Quota exceeded"**
+- Check GCP quotas in console
+- Request quota increase if needed
 
-- **HTTPS/TLS**: SSL certificates with Let's Encrypt
-- **Authentication**: API key or OAuth for /api/* endpoints
-- **Rate Limiting**: Prevent abuse with HAProxy stick tables
-- **Secret Management**: Docker secrets or HashiCorp Vault
-- **Network Segmentation**: Separate frontend/backend networks
-- **Logging**: Centralized logging with ELK or Loki
-- **Vulnerability Scanning**: Trivy, Clair, or Snyk integration
+### SSH Issues
 
----
+**Can't connect to VM**
+- Check firewall rules: `gcloud compute firewall-rules list`
+- Verify SSH key: `terraform output` shows key in metadata
+- Check VM status: `gcloud compute instances describe automation-alchemy`
 
-## 📚 Additional Resources
-
-### Docker & Containerization
-
-- [Docker Documentation](https://docs.docker.com/)
-- [Docker Compose Reference](https://docs.docker.com/compose/)
-- [Container Best Practices](https://docs.docker.com/develop/dev-best-practices/)
-
-### Load Balancing
-
-- [HAProxy Documentation](http://www.haproxy.org/#docs)
-- [NGINX Reverse Proxy Guide](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)
-
-### Monitoring & Observability
-
-- [Netdata Documentation](https://learn.netdata.cloud/)
-- [Prometheus & Grafana](https://prometheus.io/docs/visualization/grafana/)
+See [Terraform Setup](docs/what-and-why/TERRAFORM_SETUP.md) for more troubleshooting.
 
 ---
 
-## 🤝 Contributing
+## 🧹 Cleanup
+
+To destroy all infrastructure:
+
+```bash
+cd terraform
+terraform destroy
+```
+
+**Warning**: This will delete all VMs and infrastructure. Cost goes to $0/month.
+
+---
+
+## 🎯 Goals & Learning Outcomes
+
+By completing this project, you'll learn:
+
+1. **Infrastructure as Code**: Terraform for cloud provisioning
+2. **Configuration Management**: Ansible for server automation
+3. **CI/CD**: GitLab CI pipeline creation
+4. **Cloud Fundamentals**: GCP services, networking, security
+5. **DevOps Best Practices**: Automation, version control, documentation
+6. **Cost Optimization**: Free tier usage, resource management
+
+---
+
+## 🚀 Next Steps
+
+1. ✅ **Phase 1 Complete**: Infrastructure provisioned
+2. 🚧 **Phase 2**: Set up Ansible playbooks
+3. 📋 **Phase 3**: Configure GitLab CI
+4. 📋 **Phase 4-7**: Testing, alerts, rollback, one-click deployment
+
+See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed next steps.
+
+---
+
+## 📝 Contributing
 
 This is an educational project. Feel free to:
-
-- Experiment with different configurations
-- Add new features (database integration, caching, etc.)
-- Implement additional load balancing algorithms
-- Enhance security measures
-- Improve monitoring and alerting
+- Experiment with configurations
+- Add new features
+- Improve documentation
+- Share your learnings
 
 ---
 
@@ -607,14 +393,27 @@ MIT License - Free to use for learning and development purposes.
 
 ## 🏆 Success Criteria
 
-- ✅ All containers start and report healthy status
-- ✅ Load balancer distributes traffic between web servers
-- ✅ Frontend displays metrics from backend API
-- ✅ HAProxy stats page shows server health
-- ✅ Netdata provides real-time monitoring
-- ✅ Backup and restore scripts function correctly
-- ✅ Firewall rules secure production servers
+- ✅ Infrastructure provisioned with Terraform
+- ✅ VMs accessible and configured
+- ✅ CI/CD pipeline functional
+- ✅ Automated testing integrated
+- ✅ One-click deployment working
+- ✅ Cost optimized (free tier)
 
 ---
 
-**Ready to explore modern DevOps infrastructure? Start the containers and access http://localhost:8080 to see your infrastructure in action! 🚀**
+## 🔗 Useful Links
+
+- [Terraform Documentation](https://www.terraform.io/docs)
+- [Ansible Documentation](https://docs.ansible.com/)
+- [GitLab CI Documentation](https://docs.gitlab.com/ee/ci/)
+- [GCP Documentation](https://cloud.google.com/docs)
+- [GCP Free Tier](https://cloud.google.com/free)
+
+---
+
+**Ready to automate? Start with `terraform apply` and watch your infrastructure come to life! 🚀**
+
+**Current Status**: Phase 1 Complete ✅ | Phase 2 In Progress 🚧
+
+**Last Updated**: 2025-11-20
