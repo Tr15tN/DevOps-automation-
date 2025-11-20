@@ -27,7 +27,8 @@ variables:
 
 terraform:validate:
   stage: validate
-  image: alpine/terraform:latest
+  image: hashicorp/terraform:1.5
+  entrypoint: [""]
   script:
     - |
       cd terraform
@@ -43,10 +44,9 @@ terraform:validate:
 ansible:lint:
   stage: validate
   image: cytopia/ansible-lint:latest
+  entrypoint: [""]
   script:
-    - |
-      cd /builds/$CI_PROJECT_PATH
-      ansible-lint ansible/playbooks/*.yml || true
+    - ansible-lint ansible/playbooks/*.yml || true
   only:
     - merge_requests
     - main
