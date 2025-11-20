@@ -79,8 +79,14 @@ docker:build:
     - apk add --no-cache curl python3 py3-pip bash
     - curl https://sdk.cloud.google.com | bash
     - export PATH=$PATH:/root/google-cloud-sdk/bin
-    - echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/gcp-key.json
-    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - |
+      echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/gcp-key.json
+      if [ ! -s /tmp/gcp-key.json ]; then
+        echo "ERROR: Failed to decode GCP_SERVICE_ACCOUNT_KEY"
+        echo "Key length: ${#GCP_SERVICE_ACCOUNT_KEY}"
+        exit 1
+      fi
+      gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud auth configure-docker $CONTAINER_REGISTRY
   script:
