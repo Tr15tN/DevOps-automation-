@@ -27,11 +27,13 @@ variables:
 
 terraform:validate:
   stage: validate
-  image: hashicorp/terraform:1.5
+  image: alpine/terraform:latest
   script:
-    - cd terraform && terraform init -backend=false
-    - cd terraform && terraform validate
-    - cd terraform && terraform fmt -check
+    - |
+      cd terraform
+      terraform init -backend=false
+      terraform validate
+      terraform fmt -check
   only:
     - merge_requests
     - main
