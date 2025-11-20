@@ -13,17 +13,19 @@ VERSION_HISTORY_FILE="${APP_DIR}/.version-history"
 # Colors
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
+# YELLOW='\033[1;33m'  # Currently unused, reserved for future use
 NC='\033[0m'
 
 # Functions
 save_version() {
     local version=$1
-    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     
     # Save current as previous
     if [ -f "$VERSION_FILE" ]; then
-        local current=$(cat "$VERSION_FILE")
+        local current
+        current=$(cat "$VERSION_FILE")
         if [ -n "$current" ]; then
             echo "$current" > "$PREVIOUS_VERSION_FILE"
         fi

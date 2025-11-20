@@ -48,7 +48,7 @@ if [ -z "$PREVIOUS_VERSION" ]; then
     echo "1. Use 'latest' tag"
     echo "2. Specify a version manually"
     echo ""
-    read -p "Enter version to rollback to (or 'latest'): " ROLLBACK_VERSION
+    read -r -p "Enter version to rollback to (or 'latest'): " ROLLBACK_VERSION
     if [ -z "$ROLLBACK_VERSION" ]; then
         ROLLBACK_VERSION="latest"
     fi
@@ -71,7 +71,7 @@ echo "Rollback image:   $ROLLBACK_IMAGE"
 echo ""
 
 # Confirm rollback
-read -p "Are you sure you want to rollback? (yes/no): " CONFIRM
+read -r -p "Are you sure you want to rollback? (yes/no): " CONFIRM
 if [ "$CONFIRM" != "yes" ]; then
     echo "Rollback cancelled."
     exit 0
