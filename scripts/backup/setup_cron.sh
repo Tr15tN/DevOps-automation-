@@ -17,8 +17,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Prompt for backup sources
-read -p "Enter backup source user@host (e.g., devops@10.0.0.10): " BACKUP_SOURCE
-read -p "Enter backup destination directory (e.g., /backups/server-01): " BACKUP_DEST
+read -r -p "Enter backup source user@host (e.g., devops@10.0.0.10): " BACKUP_SOURCE
+read -r -p "Enter backup destination directory (e.g., /backups/server-01): " BACKUP_DEST
 
 # Validate inputs
 if [[ -z "$BACKUP_SOURCE" || -z "$BACKUP_DEST" ]]; then
@@ -64,7 +64,7 @@ fi
 echo ""
 echo "⏰ Setting up weekly cron job (Sundays at 3 AM)..."
 
-CRON_CMD="0 3 * * 0 $SCRIPT_DIR/backup.sh $BACKUP_SOURCE:/ $BACKUP_DEST >> /var/log/backup-$(echo $BACKUP_SOURCE | tr '@:' '-').log 2>&1"
+CRON_CMD="0 3 * * 0 $SCRIPT_DIR/backup.sh $BACKUP_SOURCE:/ $BACKUP_DEST >> /var/log/backup-$(echo "$BACKUP_SOURCE" | tr '@:' '-').log 2>&1"
 
 # Check if cron job already exists
 if crontab -l 2>/dev/null | grep -q "$SCRIPT_DIR/backup.sh"; then
@@ -86,13 +86,13 @@ echo "📝 Summary:"
 echo "   - Backup source: $BACKUP_SOURCE"
 echo "   - Backup destination: $BACKUP_DEST"
 echo "   - Schedule: Every Sunday at 3:00 AM"
-echo "   - Log file: /var/log/backup-$(echo $BACKUP_SOURCE | tr '@:' '-').log"
+echo "   - Log file: /var/log/backup-$(echo "$BACKUP_SOURCE" | tr '@:' '-').log"
 echo ""
 echo "💡 To manually run backup:"
 echo "   $SCRIPT_DIR/backup.sh $BACKUP_SOURCE:/ $BACKUP_DEST"
 echo ""
 echo "💡 To view cron logs:"
-echo "   tail -f /var/log/backup-$(echo $BACKUP_SOURCE | tr '@:' '-').log"
+echo "   tail -f /var/log/backup-$(echo "$BACKUP_SOURCE" | tr '@:' '-').log"
 echo ""
 
 

@@ -21,20 +21,20 @@ fi
 
 # Set project
 echo "📋 Setting GCP project..."
-gcloud config set project ${PROJECT_ID}
+gcloud config set project "${PROJECT_ID}"
 
 # Enable Container Registry API
 echo "🔌 Enabling Container Registry API..."
-gcloud services enable containerregistry.googleapis.com --project=${PROJECT_ID}
+gcloud services enable containerregistry.googleapis.com --project="${PROJECT_ID}"
 
 # Check if service account exists
-if gcloud iam service-accounts describe ${SA_EMAIL} --project=${PROJECT_ID} &> /dev/null; then
+if gcloud iam service-accounts describe "${SA_EMAIL}" --project="${PROJECT_ID}" &> /dev/null; then
     echo "⚠️  Service account ${SA_EMAIL} already exists"
     read -p "Do you want to recreate it? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "🗑️  Deleting existing service account..."
-        gcloud iam service-accounts delete ${SA_EMAIL} --project=${PROJECT_ID} --quiet || true
+        gcloud iam service-accounts delete "${SA_EMAIL}" --project="${PROJECT_ID}" --quiet || true
     else
         echo "✅ Using existing service account"
         SKIP_SA_CREATION=true
@@ -44,19 +44,19 @@ fi
 # Create service account if needed
 if [ "${SKIP_SA_CREATION}" != "true" ]; then
     echo "👤 Creating service account..."
-    gcloud iam service-accounts create ${SA_NAME} \
+    gcloud iam service-accounts create "${SA_NAME}" \
         --display-name="GitLab CI Service Account" \
-        --project=${PROJECT_ID}
+        --project="${PROJECT_ID}"
 fi
 
 # Grant permissions
 echo "🔐 Granting permissions..."
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
     --member="serviceAccount:${SA_EMAIL}" \
     --role="roles/storage.admin" \
     --condition=None
 
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
     --member="serviceAccount:${SA_EMAIL}" \
     --role="roles/iam.serviceAccountUser" \
     --condition=None
@@ -64,9 +64,9 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} \
 # Create and download key
 echo "🔑 Creating service account key..."
 KEY_FILE="gitlab-ci-key.json"
-gcloud iam service-accounts keys create ${KEY_FILE} \
-    --iam-account=${SA_EMAIL} \
-    --project=${PROJECT_ID}
+gcloud iam service-accounts keys create "${KEY_FILE}" \
+    --iam-account="${SA_EMAIL}" \
+    --project="${PROJECT_ID}"
 
 # Encode key for GitLab
 echo ""

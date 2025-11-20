@@ -54,4 +54,5 @@ id_ed25519
 !package.json
 !package-lock.json
 !.eslintrc.json
+!eslint.config.js
 

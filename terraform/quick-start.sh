@@ -29,7 +29,7 @@ if [ ! -f "terraform.tfvars" ]; then
     echo "⚠️  IMPORTANT: Edit terraform.tfvars and set your project_id!"
     echo "   File: terraform/terraform.tfvars"
     echo ""
-    read -p "Press Enter after you've edited terraform.tfvars..."
+    read -r -p "Press Enter after you've edited terraform.tfvars..."
 fi
 
 # Check if SSH key exists

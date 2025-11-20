@@ -9,7 +9,7 @@ echo "🔗 Running Integration Tests..."
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
+# YELLOW='\033[1;33m'  # Currently unused
 NC='\033[0m' # No Color
 
 # Configuration
@@ -80,9 +80,9 @@ if [ -n "$VM_IP" ]; then
     
     # Make multiple requests and check if they're distributed
     WEB1_COUNT=0
-    WEB2_COUNT=0
+    # WEB2_COUNT=0  # Currently unused, reserved for future use
     
-    for i in {1..10}; do
+    for _ in {1..10}; do
         # Check which web server responded (by checking response headers or content)
         RESPONSE=$(curl -s --max-time 5 "$BASE_URL/api/status" || echo "")
         if [ -n "$RESPONSE" ]; then

@@ -61,7 +61,7 @@ test_endpoint() {
         SUCCESS=0
         FAILED=0
         
-        for i in $(seq 1 "$REQUESTS"); do
+        for _ in $(seq 1 "$REQUESTS"); do
             if curl -f -s -o /dev/null -w "%{http_code}" --max-time 5 "$url" | grep -q "200"; then
                 SUCCESS=$((SUCCESS + 1))
             else

@@ -26,7 +26,7 @@ TARGET="$DEST/full-$DATE"
 mkdir -p "$TARGET"
 
 for path in "${INCLUDE[@]}"; do
-  rsync ${RSYNC_OPTS[*]} "$SRC$path" "$TARGET$path"
+  rsync "${RSYNC_OPTS[@]}" "$SRC$path" "$TARGET$path"
 done
 
 echo "Backup completed to $TARGET"
