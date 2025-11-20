@@ -122,8 +122,9 @@ deploy:ansible:
   image: alpine:latest
   before_script:
     - apk add --no-cache openssh-client ansible python3 py3-pip
-    - pip3 install --upgrade pip
-    - pip3 install docker
+    - python3 -m venv /tmp/venv
+    - . /tmp/venv/bin/activate
+    - pip install docker
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
