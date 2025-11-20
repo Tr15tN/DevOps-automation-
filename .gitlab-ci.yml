@@ -11,7 +11,7 @@ variables:
   # GCP Configuration
   GCP_PROJECT_ID: "automation-alchemy"
   GCP_REGION: "europe-north1"
-  CONTAINER_REGISTRY: "gcr.io"
+  CONTAINER_REGISTRY: "europe-north1-docker.pkg.dev"
   IMAGE_NAME: "app-server"
   
   # Docker Configuration
@@ -92,8 +92,8 @@ docker:build:
   script:
     - |
       export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
-      export IMAGE_FULL="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
-      export IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest"
+      export IMAGE_FULL="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:${IMAGE_TAG}"
+      export IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:latest"
       echo "Building Docker image: ${IMAGE_FULL}"
       cd docker/app-server
       docker build -t ${IMAGE_FULL} -t ${IMAGE_LATEST} .
@@ -130,7 +130,7 @@ deploy:ansible:
     - ssh-keyscan -H $VM_EXTERNAL_IP >> ~/.ssh/known_hosts
   script:
     - |
-      export IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest")
+      export IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:latest")
       echo "Deploying image: ${IMAGE_FULL}"
       cat > ansible/inventory/hosts.yml <<EOF
       all:
