@@ -122,35 +122,44 @@ This document tracks what has been completed, what's in progress, and what's nex
 
 ---
 
-## 📋 Phase 3: CI/CD Pipeline (GitLab CI) - PENDING
+## 🚧 Phase 3: CI/CD Pipeline (GitLab CI) - IN PROGRESS
 
-### Planned Tasks
+### Completed Tasks
 
-- [ ] **GitLab Setup**
-  - Create GitLab project (or use GitLab.com)
-  - Configure repository
-  - Set up GitLab CI/CD
+- [x] **Pipeline Configuration**
+  - Created `.gitlab-ci.yml` with 4 stages ✅
+  - Validate stage (Terraform + Ansible linting) ✅
+  - Build stage (Docker build + push to GCP) ✅
+  - Deploy stage (Ansible integration) ✅
+  - Healthcheck stage (application verification) ✅
 
-- [ ] **Pipeline Configuration**
-  - Create `.gitlab-ci.yml`
-  - Configure stages:
-    - Checkout code
-    - Run tests
-    - Build Docker images
-    - Push to container registry
-    - Deploy to VMs
-    - Health checks
-    - Rollback capability
+- [x] **Ansible Integration**
+  - Updated `app-deploy.yml` to support container registry images ✅
+  - Created `docker-compose.yml.j2` template ✅
+  - Added GCP authentication for image pulling ✅
 
-- [ ] **Container Registry**
-  - Set up GCP Container Registry (or Artifact Registry)
-  - Configure access permissions
-  - Test image push/pull
+- [x] **Documentation**
+  - Created `docs/GITLAB_CI_SETUP.md` with complete setup guide ✅
+  - Created `scripts/setup-gcp-container-registry.sh` helper script ✅
 
-- [ ] **Deployment Automation**
-  - Integrate with Ansible for deployment
-  - Set up deployment triggers
-  - Configure environment variables
+### Pending Tasks
+
+- [ ] **GitLab Setup** (User action required)
+  - Create GitLab project (GitLab.com)
+  - Push code to GitLab repository
+  - Configure GitLab CI/CD variables
+
+- [ ] **Container Registry Setup** (User action required)
+  - Run `scripts/setup-gcp-container-registry.sh`
+  - Enable Container Registry API
+  - Create service account and download key
+  - Add key to GitLab CI variables
+
+- [ ] **Testing**
+  - Test pipeline end-to-end
+  - Verify Docker image builds and pushes
+  - Verify deployment works
+  - Verify health checks pass
 
 ---
 
@@ -230,13 +239,13 @@ This document tracks what has been completed, what's in progress, and what's nex
 |-------|--------|----------|
 | Phase 1: Terraform | ✅ Complete | 100% ✅ |
 | Phase 2: Ansible | ✅ Complete | 100% ✅ |
-| Phase 3: GitLab CI | ⏳ Pending | 0% |
+| Phase 3: GitLab CI | 🚧 In Progress | 60% |
 | Phase 4: Testing | ⏳ Pending | 0% |
 | Phase 5: Alerts | ⏳ Pending | 0% |
 | Phase 6: Rollback | ⏳ Pending | 0% |
 | Phase 7: One-Click | ⏳ Pending | 0% |
 
-**Overall Progress**: ~29% (Phase 1 & 2 complete!) ✅ Infrastructure deployed and configured!
+**Overall Progress**: ~43% (Phase 1 & 2 complete, Phase 3 in progress!) ✅ Infrastructure deployed, configured, and CI/CD pipeline ready!
 
 ---
 
@@ -281,7 +290,7 @@ This document tracks what has been completed, what's in progress, and what's nex
 ---
 
 **Last Updated**: 2025-11-20  
-**Current Phase**: Phase 1 & 2 Complete ✅✅ | Ready for Phase 3 (GitLab CI)
+**Current Phase**: Phase 1 & 2 Complete ✅✅ | Phase 3 In Progress 🚧 (60% - Pipeline configured, needs GitLab setup)
 
 ---
 

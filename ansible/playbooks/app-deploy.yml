@@ -9,6 +9,8 @@
     app_user: devops
     app_dir: /opt/app
     project_name: automation-alchemy
+    # Docker image from container registry (set by GitLab CI or use default)
+    docker_image: "{{ docker_image | default('gcr.io/automation-alchemy/app-server:latest') }}"
 
   tasks:
     - name: Create application directory
@@ -19,13 +21,15 @@
         group: "{{ app_user }}"
         mode: '0755'
 
-    - name: Copy docker-compose.yml
-      copy:
-        src: "{{ playbook_dir }}/../../docker-compose.yml"
+    - name: Generate docker-compose.yml with container registry image
+      template:
+        src: docker-compose.yml.j2
         dest: "{{ app_dir }}/docker-compose.yml"
         owner: "{{ app_user }}"
         group: "{{ app_user }}"
         mode: '0644'
+      vars:
+        app_server_image: "{{ docker_image }}"
 
     - name: Create configs directory structure
       file:
@@ -81,10 +85,24 @@
         group: "{{ app_user }}"
         mode: '0644'
 
+    - name: Authenticate with GCP Container Registry (if needed)
+      shell: |
+        gcloud auth configure-docker gcr.io --quiet
+      become_user: "{{ app_user }}"
+      when: docker_image is defined and 'gcr.io' in docker_image
+      ignore_errors: yes
+
+    - name: Pull Docker image from registry
+      shell: |
+        docker pull {{ docker_image }}
+      become_user: "{{ app_user }}"
+      when: docker_image is defined and ('gcr.io' in docker_image or 'pkg.dev' in docker_image)
+      ignore_errors: yes
+
     - name: Build and start containers
       shell: |
         cd {{ app_dir }}
-        docker compose up -d --build
+        docker compose up -d --pull always
       become_user: "{{ app_user }}"
       environment:
         COMPOSE_PROJECT_NAME: "{{ project_name }}"
