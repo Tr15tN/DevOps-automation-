@@ -70,16 +70,17 @@ docker:build:
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud auth configure-docker $CONTAINER_REGISTRY
   script:
-    - export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
-    - export IMAGE_FULL="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
-    - export IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest"
-    - echo "Building Docker image: ${IMAGE_FULL}"
-    - cd docker/app-server
-    - docker build -t ${IMAGE_FULL} -t ${IMAGE_LATEST} .
-    - echo "Pushing image to GCP Container Registry..."
-    - docker push ${IMAGE_FULL}
-    - docker push ${IMAGE_LATEST}
-    - echo "${IMAGE_FULL}" > /tmp/docker-image.txt
+    - |
+      export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+      export IMAGE_FULL="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
+      export IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest"
+      echo "Building Docker image: ${IMAGE_FULL}"
+      cd docker/app-server
+      docker build -t ${IMAGE_FULL} -t ${IMAGE_LATEST} .
+      echo "Pushing image to GCP Container Registry..."
+      docker push ${IMAGE_FULL}
+      docker push ${IMAGE_LATEST}
+      echo "${IMAGE_FULL}" > /tmp/docker-image.txt
   after_script:
     - rm -f /tmp/gcp-key.json
   artifacts:
@@ -88,7 +89,6 @@ docker:build:
     expire_in: 1 hour
   only:
     - main
-    - master
     - master
     - develop
     - tags
@@ -109,9 +109,9 @@ deploy:ansible:
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $VM_EXTERNAL_IP >> ~/.ssh/known_hosts
   script:
-    - export IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest")
-    - echo "Deploying image: ${IMAGE_FULL}"
     - |
+      export IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest")
+      echo "Deploying image: ${IMAGE_FULL}"
       cat > ansible/inventory/hosts.yml <<EOF
       all:
         hosts:
@@ -121,8 +121,8 @@ deploy:ansible:
             ansible_ssh_private_key_file: ~/.ssh/id_rsa
             docker_image: ${IMAGE_FULL}
       EOF
-    - cd ansible
-    - ansible-playbook playbooks/site.yml -i inventory/hosts.yml
+      cd ansible
+      ansible-playbook playbooks/site.yml -i inventory/hosts.yml
   environment:
     name: production
     url: http://${VM_EXTERNAL_IP}:8080
