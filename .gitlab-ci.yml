@@ -100,12 +100,12 @@ docker:build:
       echo "Pushing image to GCP Container Registry..."
       docker push ${IMAGE_FULL}
       docker push ${IMAGE_LATEST}
-      echo "${IMAGE_FULL}" > /tmp/docker-image.txt
+      echo "${IMAGE_FULL}" > docker-image.txt
   after_script:
     - rm -f /tmp/gcp-key.json
   artifacts:
     paths:
-      - /tmp/docker-image.txt
+      - docker-image.txt
     expire_in: 1 hour
   only:
     - main
@@ -130,7 +130,7 @@ deploy:ansible:
     - ssh-keyscan -H $VM_EXTERNAL_IP >> ~/.ssh/known_hosts
   script:
     - |
-      export IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:latest")
+      export IMAGE_FULL=$(cat docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:latest")
       echo "Deploying image: ${IMAGE_FULL}"
       cat > ansible/inventory/hosts.yml <<EOF
       all:
