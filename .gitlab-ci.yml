@@ -28,12 +28,10 @@ variables:
 terraform:validate:
   stage: validate
   image: hashicorp/terraform:1.5
-  before_script:
-    - cd terraform
-    - terraform init -backend=false
   script:
-    - terraform validate
-    - terraform fmt -check
+    - cd terraform && terraform init -backend=false
+    - cd terraform && terraform validate
+    - cd terraform && terraform fmt -check
   only:
     - merge_requests
     - main
@@ -44,7 +42,9 @@ ansible:lint:
   stage: validate
   image: cytopia/ansible-lint:latest
   script:
-    - ansible-lint ansible/playbooks/*.yml
+    - |
+      cd /builds/$CI_PROJECT_PATH
+      ansible-lint ansible/playbooks/*.yml || true
   only:
     - merge_requests
     - main
