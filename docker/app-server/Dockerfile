@@ -22,8 +22,9 @@ RUN apk update && \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --only=production && \
+# Install dependencies (with cache mount for faster builds)
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --only=production && \
     npm cache clean --force
 
 # Copy application code

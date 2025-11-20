@@ -31,15 +31,23 @@ variables:
 terraform:validate:
   stage: validate
   image: alpine:latest
+  cache:
+    key: terraform-${TERRAFORM_VERSION}
+    paths:
+      - /usr/local/bin/terraform
   before_script:
-    - apk add --no-cache curl unzip
     - |
       TERRAFORM_VERSION=1.5.0
-      wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-      unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /tmp
-      mv /tmp/terraform /usr/local/bin/
-      chmod +x /usr/local/bin/terraform
-      rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+      if [ ! -f /usr/local/bin/terraform ]; then
+        apk add --no-cache curl unzip
+        wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+        unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /tmp
+        mv /tmp/terraform /usr/local/bin/
+        chmod +x /usr/local/bin/terraform
+        rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+      else
+        echo "Using cached Terraform binary"
+      fi
   script:
     - |
       cd terraform
@@ -76,9 +84,21 @@ ansible:lint:
 test:code-quality:
   stage: test
   image: alpine:latest
+  cache:
+    key: code-quality-tools
+    paths:
+      - /usr/local/bin/eslint
+      - /usr/local/bin/shellcheck
   before_script:
-    - apk add --no-cache bash shellcheck nodejs npm curl
-    - npm install -g eslint
+    - |
+      if ! command -v shellcheck &> /dev/null; then
+        apk add --no-cache shellcheck
+      fi
+      if ! command -v eslint &> /dev/null; then
+        apk add --no-cache nodejs npm
+        npm install -g eslint
+      fi
+      apk add --no-cache bash curl
   script:
     - chmod +x tests/code-quality.sh
     - tests/code-quality.sh
@@ -99,8 +119,12 @@ docker:build:
     - docker:24-dind
   before_script:
     - apk add --no-cache curl python3 py3-pip bash
-    - curl https://sdk.cloud.google.com | bash
-    - export PATH=$PATH:/root/google-cloud-sdk/bin
+    # Install gcloud SDK (minimal install, faster)
+    - |
+      export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+      export CLOUDSDK_INSTALL_DIR=/opt
+      curl https://sdk.cloud.google.com | bash > /dev/null 2>&1
+      export PATH=$PATH:/opt/google-cloud-sdk/bin
     - |
       echo "$GCP_SERVICE_ACCOUNT_KEY" | base64 -d > /tmp/gcp-key.json
       if [ ! -s /tmp/gcp-key.json ]; then
@@ -108,9 +132,9 @@ docker:build:
         echo "Key length: ${#GCP_SERVICE_ACCOUNT_KEY}"
         exit 1
       fi
-      gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
-    - gcloud config set project $GCP_PROJECT_ID
-    - gcloud auth configure-docker $CONTAINER_REGISTRY
+      gcloud auth activate-service-account --key-file=/tmp/gcp-key.json --quiet
+    - gcloud config set project $GCP_PROJECT_ID --quiet
+    - gcloud auth configure-docker $CONTAINER_REGISTRY --quiet
   script:
     - |
       export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
@@ -118,7 +142,8 @@ docker:build:
       export IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:latest"
       echo "Building Docker image: ${IMAGE_FULL}"
       cd docker/app-server
-      docker build -t ${IMAGE_FULL} -t ${IMAGE_LATEST} .
+      # Use build cache and parallel builds
+      DOCKER_BUILDKIT=1 docker build --cache-from ${IMAGE_LATEST} -t ${IMAGE_FULL} -t ${IMAGE_LATEST} .
       echo "Pushing image to GCP Container Registry..."
       docker push ${IMAGE_FULL}
       docker push ${IMAGE_LATEST}
@@ -144,21 +169,33 @@ docker:build:
 security:container-scan:
   stage: security
   image: alpine:latest
+  cache:
+    key: security-tools
+    paths:
+      - /usr/local/bin/trivy
   before_script:
     - apk add --no-cache bash curl python3 py3-pip
     - | 
-      # Install Trivy for Alpine Linux
-      TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | grep tag_name | cut -d '"' -f 4 | sed 's/v//')
-      wget -q https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-      tar -xzf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
-      mv trivy /usr/local/bin/
-      chmod +x /usr/local/bin/trivy
-      rm trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+      # Install Trivy (cache if possible)
+      if [ ! -f /usr/local/bin/trivy ]; then
+        TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | grep tag_name | cut -d '"' -f 4 | sed 's/v//')
+        wget -q https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+        tar -xzf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+        mv trivy /usr/local/bin/
+        chmod +x /usr/local/bin/trivy
+        rm trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+      else
+        echo "Using cached Trivy binary"
+      fi
     - |
-      # Install gcloud SDK if we need to authenticate for image scanning
+      # Install gcloud SDK if needed (minimal, faster)
       if [ -n "$GCP_SERVICE_ACCOUNT_KEY" ]; then
-        curl https://sdk.cloud.google.com | bash || true
-        export PATH=$PATH:/root/google-cloud-sdk/bin
+        export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+        export CLOUDSDK_INSTALL_DIR=/opt
+        if [ ! -d /opt/google-cloud-sdk ]; then
+          curl https://sdk.cloud.google.com | bash > /dev/null 2>&1 || true
+        fi
+        export PATH=$PATH:/opt/google-cloud-sdk/bin
       fi
   script:
     - |
