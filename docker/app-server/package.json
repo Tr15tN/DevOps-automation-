@@ -1,0 +1,27 @@
+{
+  "name": "app-server",
+  "version": "1.0.0",
+  "description": "Server Sorcery 101 - Application Server",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "os-utils": "^0.0.14"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "devops",
+    "docker",
+    "express",
+    "server",
+    "metrics"
+  ],
+  "author": "Server Sorcery 101",
+  "license": "MIT"
+}
