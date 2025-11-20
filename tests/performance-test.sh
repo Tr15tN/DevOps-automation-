@@ -39,10 +39,10 @@ test_endpoint() {
                 echo -e "    ${YELLOW}⚠${NC} Apache Bench output incomplete, falling back to curl test"
                 # Fall through to curl test
             else
-            # Extract average response time (mean time per request in milliseconds)
-            # Apache Bench shows: "Time per request: X.XXX [ms] (mean)"
-            # The value is already in milliseconds, just extract the number
-            AVG_TIME_MS=$(grep "Time per request" /tmp/ab_output.txt | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1 | cut -d'.' -f1)
+                # Extract average response time (mean time per request in milliseconds)
+                # Apache Bench shows: "Time per request: X.XXX [ms] (mean)"
+                # The value is already in milliseconds, just extract the number
+                AVG_TIME_MS=$(grep "Time per request" /tmp/ab_output.txt | head -1 | grep -oE '[0-9]+\.[0-9]+' | head -1 | cut -d'.' -f1)
                 
                 # Validate the value is reasonable (less than 1 minute)
                 if [ -z "$AVG_TIME_MS" ] || [ "$AVG_TIME_MS" -gt 60000 ]; then
