@@ -37,6 +37,7 @@ terraform:validate:
   only:
     - merge_requests
     - main
+    - master
     - develop
 
 ansible:lint:
@@ -47,6 +48,7 @@ ansible:lint:
   only:
     - merge_requests
     - main
+    - master
     - develop
   allow_failure: true
 
@@ -60,7 +62,6 @@ docker:build:
   services:
     - docker:24-dind
   before_script:
-    # Authenticate with GCP
     - apk add --no-cache curl python3 py3-pip
     - curl https://sdk.cloud.google.com | bash
     - export PATH=$PATH:/root/google-cloud-sdk/bin
@@ -68,26 +69,18 @@ docker:build:
     - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
     - gcloud config set project $GCP_PROJECT_ID
     - gcloud auth configure-docker $CONTAINER_REGISTRY
-    
-    # Set image tag
-    - IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
-    - IMAGE_FULL="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
-    - IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest"
   script:
-    # Build Docker image
+    - export IMAGE_TAG="${CI_COMMIT_SHORT_SHA}"
+    - export IMAGE_FULL="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:${IMAGE_TAG}"
+    - export IMAGE_LATEST="${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest"
     - echo "Building Docker image: ${IMAGE_FULL}"
     - cd docker/app-server
     - docker build -t ${IMAGE_FULL} -t ${IMAGE_LATEST} .
-    
-    # Push to Container Registry
     - echo "Pushing image to GCP Container Registry..."
     - docker push ${IMAGE_FULL}
     - docker push ${IMAGE_LATEST}
-    
-    # Save image info for deployment
     - echo "${IMAGE_FULL}" > /tmp/docker-image.txt
   after_script:
-    # Cleanup
     - rm -f /tmp/gcp-key.json
   artifacts:
     paths:
@@ -95,6 +88,8 @@ docker:build:
     expire_in: 1 hour
   only:
     - main
+    - master
+    - master
     - develop
     - tags
 
@@ -106,22 +101,16 @@ deploy:ansible:
   stage: deploy
   image: alpine:latest
   before_script:
-    # Install dependencies
     - apk add --no-cache openssh-client ansible python3 py3-pip
     - pip3 install --upgrade pip
     - pip3 install docker
-    
-    # Setup SSH
     - mkdir -p ~/.ssh
     - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $VM_EXTERNAL_IP >> ~/.ssh/known_hosts
-    
-    # Get Docker image from previous stage
-    - IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest")
+  script:
+    - export IMAGE_FULL=$(cat /tmp/docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}:latest")
     - echo "Deploying image: ${IMAGE_FULL}"
-    
-    # Update Ansible inventory
     - |
       cat > ansible/inventory/hosts.yml <<EOF
       all:
@@ -132,8 +121,6 @@ deploy:ansible:
             ansible_ssh_private_key_file: ~/.ssh/id_rsa
             docker_image: ${IMAGE_FULL}
       EOF
-  script:
-    # Run Ansible playbook
     - cd ansible
     - ansible-playbook playbooks/site.yml -i inventory/hosts.yml
   environment:
@@ -141,6 +128,7 @@ deploy:ansible:
     url: http://${VM_EXTERNAL_IP}:8080
   only:
     - main
+    - master
   when: manual
   allow_failure: false
 
@@ -155,25 +143,18 @@ healthcheck:application:
     - |
       echo "Checking application health..."
       HEALTH_URL="http://${VM_EXTERNAL_IP}:8080"
-      
-      # Check load balancer
       echo "Testing load balancer: ${HEALTH_URL}"
       curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" ${HEALTH_URL} || exit 1
-      
-      # Check app server directly
       echo "Testing app server: http://${VM_EXTERNAL_IP}:3000/health"
       curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://${VM_EXTERNAL_IP}:3000/health || exit 1
-      
-      # Check web servers
       echo "Testing web server 1: http://${VM_EXTERNAL_IP}:8081/health"
       curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://${VM_EXTERNAL_IP}:8081/health || exit 1
-      
       echo "Testing web server 2: http://${VM_EXTERNAL_IP}:8082/health"
       curl -f -s -o /dev/null -w "HTTP Status: %{http_code}\n" http://${VM_EXTERNAL_IP}:8082/health || exit 1
-      
-      echo "✅ All health checks passed!"
+      echo "All health checks passed!"
   only:
     - main
+    - master
   dependencies:
     - deploy:ansible
 
