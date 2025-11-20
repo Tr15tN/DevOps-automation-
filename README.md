@@ -58,12 +58,14 @@
 └─────────────────────────────────────────┘
 ```
 
-### Current Setup (Phase 1 Complete)
+### Current Setup (Phase 1 & 2 Complete)
 
 - **Region**: `europe-north1` (Finland) - Optimized for Estonia
 - **VM Count**: 1 (configurable: 1, 4, or 5)
 - **Machine Type**: `e2-micro` (Free tier eligible)
 - **Cost**: $0/month (using free tier)
+- **Application**: ✅ Running at `http://34.88.104.254:8080`
+- **Containers**: ✅ All 5 containers healthy (app-server, web-server-1, web-server-2, load-balancer, netdata)
 
 ---
 
@@ -76,8 +78,8 @@
 - **SSH Key** (will be generated if missing)
 
 For Phase 2+:
-- **Ansible** (for configuration management)
-- **GitLab Account** (for CI/CD)
+- **Ansible** (for configuration management) ✅ Installed
+- **GitLab Account** (for CI/CD) - Next phase
 
 ---
 
@@ -116,6 +118,32 @@ For Phase 2+:
    terraform output
    ```
 
+### Phase 2: Configuration Management (✅ Complete)
+
+1. **Update Ansible Inventory**
+   ```bash
+   cd ansible
+   # Run the update script (or manually update inventory/hosts.yml)
+   # The inventory should point to your VM IP from Terraform
+   ```
+
+2. **Run Ansible Playbooks**
+   ```bash
+   # From WSL (Ansible works best on Linux)
+   cd ansible
+   ansible-playbook playbooks/site.yml -i inventory/hosts.yml
+   ```
+
+3. **Verify Deployment**
+   ```bash
+   # Check containers are running
+   ssh devops@<EXTERNAL_IP>
+   docker ps
+   
+   # Test application
+   curl http://<EXTERNAL_IP>:8080
+   ```
+
 ### Access Your VM
 
 ```bash
@@ -124,6 +152,8 @@ ssh devops@<EXTERNAL_IP>
 
 # Get IP from Terraform output
 terraform output vm_instances
+
+# Current VM: 34.88.104.254
 ```
 
 ---
@@ -180,12 +210,18 @@ automation-alchemy/
 │   ├── versions.tf            # Provider versions
 │   └── terraform.tfvars        # Your configuration
 │
-├── ansible/                    # Configuration Management (Phase 2)
+├── ansible/                    # Configuration Management (Phase 2) ✅
 │   ├── playbooks/              # Ansible playbooks
-│   └── inventory/              # VM inventory
+│   │   ├── site.yml           # Main playbook
+│   │   ├── common.yml          # Common setup
+│   │   ├── docker.yml          # Docker installation
+│   │   ├── firewall.yml        # Firewall config
+│   │   ├── security.yml        # Security hardening
+│   │   └── app-deploy.yml      # Application deployment
+│   ├── inventory/              # VM inventory
+│   └── ansible.cfg             # Ansible configuration
 │
-├── jenkins/                    # CI/CD (Phase 3)
-│   └── Jenkinsfile            # Pipeline definition
+├── .gitlab-ci.yml              # GitLab CI pipeline (Phase 3)
 │
 ├── docker/                     # Application code
 │   └── app-server/            # Node.js backend
@@ -215,14 +251,14 @@ automation-alchemy/
 | Component | Technology | Status |
 |-----------|-----------|--------|
 | **Infrastructure** | Terraform + GCP | ✅ Complete |
-| **Configuration** | Ansible | 🚧 In Progress |
+| **Configuration** | Ansible | ✅ Complete |
 | **CI/CD** | GitLab CI | 📋 Planned |
 | **Cloud Provider** | Google Cloud Platform | ✅ Complete |
-| **Containerization** | Docker | 📋 Planned |
-| **Load Balancer** | HAProxy | 📋 Planned |
-| **Web Server** | NGINX | 📋 Planned |
-| **Backend** | Node.js + Express | ✅ Ready |
-| **Monitoring** | Netdata | 📋 Planned |
+| **Containerization** | Docker | ✅ Complete |
+| **Load Balancer** | HAProxy | ✅ Complete |
+| **Web Server** | NGINX | ✅ Complete |
+| **Backend** | Node.js + Express | ✅ Complete |
+| **Monitoring** | Netdata | ✅ Complete |
 
 ---
 
@@ -259,8 +295,7 @@ See [Cost Optimization Strategy](docs/COST_OPTIMIZATION_STRATEGY.md) for details
 
 - [Terraform Setup](docs/what-and-why/TERRAFORM_SETUP.md) - Complete infrastructure explanation
 - [Architecture Decisions](docs/what-and-why/ARCHITECTURE_DECISIONS.md) - Why we chose what we did
-- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) - Step-by-step plan
-- [Future Project Analysis](docs/FUTURE_PROJECT_ANALYSIS.md) - How this prepares for next project
+- [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) - Detailed progress tracking
 
 ---
 
@@ -299,7 +334,25 @@ terraform show
 terraform output vm_instances
 
 # Test SSH access
-ssh devops@<EXTERNAL_IP>
+ssh devops@34.88.104.254
+```
+
+### Verify Application
+
+```bash
+# Test load balancer
+curl http://34.88.104.254:8080
+
+# Test individual web servers
+curl http://34.88.104.254:8081/health
+curl http://34.88.104.254:8082/health
+
+# Test app server directly
+curl http://34.88.104.254:3000/health
+
+# Check containers on VM
+ssh devops@34.88.104.254
+docker ps
 ```
 
 ### Verify VM Status
@@ -372,8 +425,8 @@ By completing this project, you'll learn:
 ## 🚀 Next Steps
 
 1. ✅ **Phase 1 Complete**: Infrastructure provisioned
-2. 🚧 **Phase 2**: Set up Ansible playbooks
-3. 📋 **Phase 3**: Configure GitLab CI
+2. ✅ **Phase 2 Complete**: Ansible configuration and application deployment
+3. 📋 **Phase 3**: Configure GitLab CI pipeline
 4. 📋 **Phase 4-7**: Testing, alerts, rollback, one-click deployment
 
 See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed next steps.
@@ -400,9 +453,11 @@ MIT License - Free to use for learning and development purposes.
 
 - ✅ Infrastructure provisioned with Terraform
 - ✅ VMs accessible and configured
-- ✅ CI/CD pipeline functional
-- ✅ Automated testing integrated
-- ✅ One-click deployment working
+- ✅ Ansible automation complete (Docker, firewall, security, app deployment)
+- ✅ Application deployed and healthy (all containers running)
+- 📋 CI/CD pipeline functional (Phase 3)
+- 📋 Automated testing integrated (Phase 4)
+- 📋 One-click deployment working (Phase 7)
 - ✅ Cost optimized (free tier)
 
 ---
@@ -419,6 +474,8 @@ MIT License - Free to use for learning and development purposes.
 
 **Ready to automate? Start with `terraform apply` and watch your infrastructure come to life! 🚀**
 
-**Current Status**: Phase 1 Complete ✅ | Phase 2 In Progress 🚧
+**Current Status**: Phase 1 & 2 Complete ✅✅ | Phase 3 (GitLab CI) Next 📋
+
+**Application Live**: `http://34.88.104.254:8080` 🎉
 
 **Last Updated**: 2025-11-20
