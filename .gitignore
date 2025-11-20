@@ -53,4 +53,5 @@ id_ed25519
 *.json
 !package.json
 !package-lock.json
+!.eslintrc.json
 

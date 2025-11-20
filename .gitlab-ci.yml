@@ -1,10 +1,13 @@
 # GitLab CI/CD Pipeline for Automation Alchemy
-# Phase 3: CI/CD Pipeline
+# Phase 3: CI/CD Pipeline + Phase 4: Testing Integration
 
 stages:
   - validate
+  - test
   - build
+  - security
   - deploy
+  - integration
   - healthcheck
 
 variables:
@@ -67,6 +70,25 @@ ansible:lint:
   # Note: allow_failure is true because linting is optional - it helps catch issues but shouldn't block the pipeline
 
 # =============================================================================
+# TEST STAGE (Phase 4: Code Quality)
+# =============================================================================
+
+test:code-quality:
+  stage: test
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash shellcheck nodejs npm curl
+    - npm install -g eslint
+  script:
+    - chmod +x tests/code-quality.sh
+    - tests/code-quality.sh
+  only:
+    - merge_requests
+    - master
+    - develop
+  allow_failure: false
+
+# =============================================================================
 # BUILD STAGE
 # =============================================================================
 
@@ -101,6 +123,8 @@ docker:build:
       docker push ${IMAGE_FULL}
       docker push ${IMAGE_LATEST}
       echo "${IMAGE_FULL}" > docker-image.txt
+      cd ../..
+      cp docker/app-server/docker-image.txt docker-image.txt
   after_script:
     - rm -f /tmp/gcp-key.json
   artifacts:
@@ -112,6 +136,44 @@ docker:build:
     - master
     - develop
     - tags
+
+# =============================================================================
+# SECURITY STAGE (Phase 4: Security Scanning)
+# =============================================================================
+
+security:container-scan:
+  stage: security
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl
+    - | 
+      # Install Trivy for Alpine Linux
+      TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | grep tag_name | cut -d '"' -f 4 | sed 's/v//')
+      wget -q https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+      tar -xzf trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+      mv trivy /usr/local/bin/
+      chmod +x /usr/local/bin/trivy
+      rm trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz
+  script:
+    - |
+      export IMAGE_FULL=$(cat docker-image.txt || echo "${CONTAINER_REGISTRY}/${GCP_PROJECT_ID}/${IMAGE_NAME}/${IMAGE_NAME}:latest")
+      export DOCKER_IMAGE=${IMAGE_FULL}
+      chmod +x tests/security-scan.sh
+      tests/security-scan.sh
+  dependencies:
+    - docker:build
+  artifacts:
+    reports:
+      sast: trivy-report.json
+    paths:
+      - trivy-report.json
+    expire_in: 1 week
+  only:
+    - main
+    - master
+    - develop
+  allow_failure: true
+  # Security scans are important but shouldn't block deployment for warnings
 
 # =============================================================================
 # DEPLOY STAGE
@@ -178,4 +240,49 @@ healthcheck:application:
     - master
   dependencies:
     - deploy:ansible
+
+# =============================================================================
+# INTEGRATION STAGE (Phase 4: Integration & Performance Tests)
+# =============================================================================
+
+test:integration:
+  stage: integration
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl
+  script:
+    - |
+      export BASE_URL="http://${VM_EXTERNAL_IP}:8080"
+      export VM_IP="${VM_EXTERNAL_IP}"
+      chmod +x tests/integration-test.sh
+      tests/integration-test.sh
+  dependencies:
+    - deploy:ansible
+  only:
+    - main
+    - master
+  when: manual
+  allow_failure: false
+
+test:performance:
+  stage: integration
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash curl apache2-utils bc
+  script:
+    - |
+      export TARGET_URL="http://${VM_EXTERNAL_IP}:8080"
+      export REQUESTS=50
+      export CONCURRENCY=5
+      export MAX_RESPONSE_TIME=1000
+      chmod +x tests/performance-test.sh
+      tests/performance-test.sh
+  dependencies:
+    - deploy:ansible
+  only:
+    - main
+    - master
+  when: manual
+  allow_failure: true
+  # Performance tests are informative but shouldn't block deployment
 

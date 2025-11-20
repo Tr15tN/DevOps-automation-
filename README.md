@@ -144,6 +144,32 @@ For Phase 2+:
    curl http://<EXTERNAL_IP>:8080
    ```
 
+### Phase 4: Testing Integration (🔄 In Progress)
+
+1. **Run Tests Locally**
+   ```bash
+   # Code quality tests
+   ./tests/code-quality.sh
+   
+   # Security scanning
+   ./tests/security-scan.sh
+   
+   # Integration tests
+   BASE_URL=http://34.88.104.254:8080 VM_IP=34.88.104.254 ./tests/integration-test.sh
+   
+   # Performance tests
+   TARGET_URL=http://34.88.104.254:8080 ./tests/performance-test.sh
+   ```
+
+2. **Tests in CI Pipeline**
+   - Code quality runs automatically on every commit
+   - Security scanning runs after Docker build
+   - Integration & performance tests run manually after deployment
+   - See `.gitlab-ci.yml` for full pipeline configuration
+
+3. **Test Documentation**
+   - See `tests/README.md` for detailed test documentation
+
 ### Access Your VM
 
 ```bash
@@ -193,6 +219,15 @@ terraform output vm_instances
 - [x] Health check stage ✅
 - [x] End-to-end pipeline tested and working ✅
 
+### 🔄 Phase 4: Testing Integration - IN PROGRESS
+
+- [x] Code quality tests (ESLint + ShellCheck) ✅
+- [x] Security scanning (Trivy) ✅
+- [x] Performance tests (load testing) ✅
+- [x] Integration tests (API endpoints) ✅
+- [x] All tests integrated into CI pipeline ✅
+- [ ] Pipeline testing (pending CI run)
+
 ### 📋 Phase 4-7: Testing, Alerts, Rollback, One-Click - PLANNED
 
 See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed status.
@@ -221,6 +256,13 @@ automation-alchemy/
 │   │   └── app-deploy.yml      # Application deployment
 │   ├── inventory/              # VM inventory
 │   └── ansible.cfg             # Ansible configuration
+│
+├── tests/                      # Testing Framework (Phase 4) 🔄
+│   ├── code-quality.sh         # ESLint + ShellCheck
+│   ├── security-scan.sh        # Trivy security scanning
+│   ├── performance-test.sh     # Load testing
+│   ├── integration-test.sh     # API & E2E tests
+│   └── README.md               # Test documentation
 │
 ├── .gitlab-ci.yml              # GitLab CI pipeline (Phase 3)
 │
@@ -475,7 +517,7 @@ MIT License - Free to use for learning and development purposes.
 
 **Ready to automate? Start with `terraform apply` and watch your infrastructure come to life! 🚀**
 
-**Current Status**: Phase 1, 2 & 3 Complete ✅✅✅ | Phase 4 (Testing) Next 📋
+**Current Status**: Phase 1, 2 & 3 Complete ✅✅✅ | Phase 4 (Testing) In Progress 🔄
 
 **Application Live**: `http://34.88.104.254:8080` 🎉
 
