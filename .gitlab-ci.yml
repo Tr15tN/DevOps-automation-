@@ -61,6 +61,7 @@ ansible:lint:
     - master
     - develop
   allow_failure: true
+  # Note: allow_failure is true because linting is optional - it helps catch issues but shouldn't block the pipeline
 
 # =============================================================================
 # BUILD STAGE

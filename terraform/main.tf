@@ -134,17 +134,17 @@ locals {
   # Determine which VMs to create based on vm_count
   create_vms = var.vm_count == 1 ? {
     "all-in-one" = {
-      name        = "automation-alchemy"
+      name         = "automation-alchemy"
       machine_type = var.vm_machine_type
       disk_size    = var.vm_disk_size
       role         = "all-in-one"
     }
-  } : var.vm_count == 4 ? {
+    } : var.vm_count == 4 ? {
     "load-balancer" = var.vm_roles["load-balancer"]
-    "web-server-1" = var.vm_roles["web-server-1"]
-    "web-server-2" = var.vm_roles["web-server-2"]
-    "app-server"   = var.vm_roles["app-server"]
-  } : {
+    "web-server-1"  = var.vm_roles["web-server-1"]
+    "web-server-2"  = var.vm_roles["web-server-2"]
+    "app-server"    = var.vm_roles["app-server"]
+    } : {
     for role, config in var.vm_roles : role => config
   }
 }

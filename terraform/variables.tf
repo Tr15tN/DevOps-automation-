@@ -6,7 +6,7 @@ variable "project_id" {
 variable "region" {
   description = "The GCP region for resources"
   type        = string
-  default     = "europe-north1"  # Finland - closest to Estonia
+  default     = "europe-north1" # Finland - closest to Estonia
 }
 
 variable "zone" {
@@ -72,33 +72,33 @@ variable "enable_monitoring" {
 variable "vm_roles" {
   description = "VM roles and their configurations"
   type = map(object({
-    name        = string
+    name         = string
     machine_type = string
     disk_size    = number
   }))
   default = {
     load-balancer = {
-      name        = "load-balancer"
+      name         = "load-balancer"
       machine_type = "e2-micro"
       disk_size    = 30
     }
     web-server-1 = {
-      name        = "web-server-1"
+      name         = "web-server-1"
       machine_type = "e2-micro"
       disk_size    = 30
     }
     web-server-2 = {
-      name        = "web-server-2"
+      name         = "web-server-2"
       machine_type = "e2-micro"
       disk_size    = 30
     }
     app-server = {
-      name        = "app-server"
+      name         = "app-server"
       machine_type = "e2-micro"
       disk_size    = 30
     }
     jenkins = {
-      name        = "jenkins"
+      name         = "jenkins"
       machine_type = "e2-micro"
       disk_size    = 30
     }
