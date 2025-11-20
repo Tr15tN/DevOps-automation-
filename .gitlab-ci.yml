@@ -32,13 +32,14 @@ variables:
 terraform:validate:
   stage: validate
   image: alpine:latest
+  variables:
+    TERRAFORM_VERSION: "1.5.0"
   cache:
     key: terraform-${TERRAFORM_VERSION}
     paths:
       - /usr/local/bin/terraform
   before_script:
     - |
-      TERRAFORM_VERSION=1.5.0
       if [ ! -f /usr/local/bin/terraform ]; then
         apk add --no-cache curl unzip
         wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
@@ -312,8 +313,8 @@ rollback:deploy:
       # Copy rollback script to VM
       scp scripts/rollback.sh devops@${VM_EXTERNAL_IP}:/tmp/rollback.sh
       scp scripts/version-manager.sh devops@${VM_EXTERNAL_IP}:/tmp/version-manager.sh
-      # Execute rollback
-      ssh devops@${VM_EXTERNAL_IP} << 'EOF'
+      # Execute rollback (unquoted EOF to allow variable expansion)
+      ssh devops@${VM_EXTERNAL_IP} << EOF
         chmod +x /tmp/rollback.sh /tmp/version-manager.sh
         export APP_DIR=/opt/app
         export CONTAINER_REGISTRY=${CONTAINER_REGISTRY}
