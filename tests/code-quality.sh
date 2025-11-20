@@ -21,7 +21,8 @@ if command -v eslint &> /dev/null; then
     # Check JavaScript files
     if [ -f "docker/app-server/server.js" ]; then
         echo "  Checking JavaScript files..."
-        if eslint docker/app-server/server.js; then
+        # Run ESLint from the app-server directory so it finds eslint.config.js
+        if (cd docker/app-server && eslint server.js); then
             echo -e "  ${GREEN}✓${NC} JavaScript code quality: PASS"
         else
             echo -e "  ${RED}✗${NC} JavaScript code quality: FAIL"
