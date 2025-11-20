@@ -287,6 +287,50 @@ healthcheck:application:
     - deploy:ansible
 
 # =============================================================================
+# ROLLBACK STAGE (Phase 6: Rollback Strategy)
+# =============================================================================
+
+rollback:deploy:
+  stage: rollback
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache openssh-client ansible python3 py3-pip
+    - python3 -m venv /tmp/venv
+    - . /tmp/venv/bin/activate
+    - pip install docker
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $VM_EXTERNAL_IP >> ~/.ssh/known_hosts
+  script:
+    - |
+      echo "🔄 Rollback Deployment"
+      echo "======================"
+      echo ""
+      echo "This will rollback to the previous deployed version."
+      echo ""
+      # Copy rollback script to VM
+      scp scripts/rollback.sh devops@${VM_EXTERNAL_IP}:/tmp/rollback.sh
+      scp scripts/version-manager.sh devops@${VM_EXTERNAL_IP}:/tmp/version-manager.sh
+      # Execute rollback
+      ssh devops@${VM_EXTERNAL_IP} << 'EOF'
+        chmod +x /tmp/rollback.sh /tmp/version-manager.sh
+        export APP_DIR=/opt/app
+        export CONTAINER_REGISTRY=${CONTAINER_REGISTRY}
+        export GCP_PROJECT_ID=${GCP_PROJECT_ID}
+        export IMAGE_NAME=${IMAGE_NAME}
+        /tmp/rollback.sh
+      EOF
+  environment:
+    name: production
+    url: http://${VM_EXTERNAL_IP}:8080
+  only:
+    - main
+    - master
+  when: manual
+  allow_failure: false
+
+# =============================================================================
 # INTEGRATION STAGE (Phase 4: Integration & Performance Tests)
 # =============================================================================
 
