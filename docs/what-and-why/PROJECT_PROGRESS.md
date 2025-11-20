@@ -122,44 +122,51 @@ This document tracks what has been completed, what's in progress, and what's nex
 
 ---
 
-## 🚧 Phase 3: CI/CD Pipeline (GitLab CI) - IN PROGRESS
+## ✅ Phase 3: CI/CD Pipeline (GitLab CI) - COMPLETE
 
 ### Completed Tasks
 
 - [x] **Pipeline Configuration**
   - Created `.gitlab-ci.yml` with 4 stages ✅
   - Validate stage (Terraform + Ansible linting) ✅
-  - Build stage (Docker build + push to GCP) ✅
+  - Build stage (Docker build + push to Artifact Registry) ✅
   - Deploy stage (Ansible integration) ✅
   - Healthcheck stage (application verification) ✅
 
 - [x] **Ansible Integration**
-  - Updated `app-deploy.yml` to support container registry images ✅
+  - Updated `app-deploy.yml` to support Artifact Registry images ✅
   - Created `docker-compose.yml.j2` template ✅
+  - Fixed recursive variable issue ✅
   - Added GCP authentication for image pulling ✅
 
-- [x] **Documentation**
-  - Created `docs/GITLAB_CI_SETUP.md` with complete setup guide ✅
-  - Created `scripts/setup-gcp-container-registry.sh` helper script ✅
+- [x] **GitLab Setup**
+  - Created GitLab project ✅
+  - Pushed code to GitLab repository ✅
+  - Configured GitLab CI/CD variables ✅
+  - Protected master branch ✅
 
-### Pending Tasks
+- [x] **Container Registry Setup**
+  - Created Artifact Registry repository ✅
+  - Enabled Artifact Registry API ✅
+  - Created service account and configured permissions ✅
+  - Added service account key to GitLab CI variables ✅
+  - Granted VM service account Artifact Registry Reader permission ✅
 
-- [ ] **GitLab Setup** (User action required)
-  - Create GitLab project (GitLab.com)
-  - Push code to GitLab repository
-  - Configure GitLab CI/CD variables
+- [x] **Testing**
+  - Pipeline tested end-to-end ✅
+  - Docker image builds and pushes successfully ✅
+  - Deployment works correctly ✅
+  - All stages passing ✅
 
-- [ ] **Container Registry Setup** (User action required)
-  - Run `scripts/setup-gcp-container-registry.sh`
-  - Enable Container Registry API
-  - Create service account and download key
-  - Add key to GitLab CI variables
+### Current Status
 
-- [ ] **Testing**
-  - Test pipeline end-to-end
-  - Verify Docker image builds and pushes
-  - Verify deployment works
-  - Verify health checks pass
+**Phase 3 Complete**: GitLab CI/CD pipeline is fully functional. Docker images are built, pushed to Artifact Registry, and deployed to VMs automatically.
+
+**Pipeline Flow**:
+1. ✅ **validate**: Terraform validation + Ansible linting
+2. ✅ **build**: Docker image built and pushed to `europe-north1-docker.pkg.dev/automation-alchemy/app-server/app-server:latest`
+3. ✅ **deploy**: Ansible deploys new image to VM (manual trigger)
+4. ✅ **healthcheck**: Verifies application is healthy
 
 ---
 
@@ -239,13 +246,13 @@ This document tracks what has been completed, what's in progress, and what's nex
 |-------|--------|----------|
 | Phase 1: Terraform | ✅ Complete | 100% ✅ |
 | Phase 2: Ansible | ✅ Complete | 100% ✅ |
-| Phase 3: GitLab CI | 🚧 In Progress | 60% |
+| Phase 3: GitLab CI | ✅ Complete | 100% ✅ |
 | Phase 4: Testing | ⏳ Pending | 0% |
 | Phase 5: Alerts | ⏳ Pending | 0% |
 | Phase 6: Rollback | ⏳ Pending | 0% |
 | Phase 7: One-Click | ⏳ Pending | 0% |
 
-**Overall Progress**: ~43% (Phase 1 & 2 complete, Phase 3 in progress!) ✅ Infrastructure deployed, configured, and CI/CD pipeline ready!
+**Overall Progress**: ~43% (Phase 1, 2 & 3 complete!) ✅ Infrastructure deployed, configured, and CI/CD pipeline fully functional!
 
 ---
 
@@ -290,7 +297,7 @@ This document tracks what has been completed, what's in progress, and what's nex
 ---
 
 **Last Updated**: 2025-11-20  
-**Current Phase**: Phase 1 & 2 Complete ✅✅ | Phase 3 In Progress 🚧 (60% - Pipeline configured, needs GitLab setup)
+**Current Phase**: Phase 1, 2 & 3 Complete ✅✅✅ | Ready for Phase 4 (Testing Integration)
 
 ---
 
