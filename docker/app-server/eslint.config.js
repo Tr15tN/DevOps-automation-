@@ -1,17 +1,26 @@
 // ESLint v9+ configuration
-import globals from "globals";
-
 export default [
   {
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
       globals: {
-        ...globals.node,
+        // Node.js globals
+        console: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        global: "readonly",
+        // Timer functions
         setTimeout: "readonly",
         clearTimeout: "readonly",
         setInterval: "readonly",
-        clearInterval: "readonly"
+        clearInterval: "readonly",
+        // Other Node.js globals
+        require: "readonly",
+        module: "readonly",
+        exports: "readonly"
       }
     },
     rules: {
