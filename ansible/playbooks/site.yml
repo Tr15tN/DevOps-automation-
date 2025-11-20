@@ -1,0 +1,10 @@
+---
+# Main Site Playbook
+# Runs all playbooks in order
+
+- import_playbook: common.yml
+- import_playbook: docker.yml
+- import_playbook: firewall.yml
+- import_playbook: security.yml
+- import_playbook: app-deploy.yml
+

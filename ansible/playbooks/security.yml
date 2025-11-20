@@ -1,0 +1,92 @@
+---
+# Security Hardening Playbook
+# Hardens the system with security best practices
+
+- name: Security hardening
+  hosts: all
+  become: yes
+  vars:
+    admin_user: devops
+    fail2ban_enabled: true
+
+  tasks:
+    - name: Configure SSH security
+      blockinfile:
+        path: /etc/ssh/sshd_config
+        block: |
+          # Security settings
+          PermitRootLogin no
+          PasswordAuthentication no
+          PubkeyAuthentication yes
+          ChallengeResponseAuthentication no
+          UsePAM yes
+          X11Forwarding no
+          MaxAuthTries 3
+          ClientAliveInterval 300
+          ClientAliveCountMax 2
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        create: yes
+
+    - name: Restart SSH service
+      systemd:
+        name: sshd
+        state: restarted
+      notify: wait_for_ssh
+
+    - name: Configure fail2ban
+      blockinfile:
+        path: /etc/fail2ban/jail.local
+        block: |
+          [sshd]
+          enabled = true
+          port = 22
+          filter = sshd
+          logpath = /var/log/auth.log
+          maxretry = 3
+          bantime = 3600
+          findtime = 600
+        create: yes
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+    - name: Start and enable fail2ban
+      systemd:
+        name: fail2ban
+        state: started
+        enabled: yes
+
+    - name: Configure automatic security updates
+      copy:
+        content: |
+          Unattended-Upgrade::Allowed-Origins {
+              "${distro_id}:${distro_codename}-security";
+              "${distro_id}ESMApps:${distro_codename}-apps-security";
+              "${distro_id}ESM:${distro_codename}-infra-security";
+          };
+          Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+          Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+          Unattended-Upgrade::Remove-Unused-Dependencies "true";
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        mode: '0644'
+
+    - name: Set up log rotation
+      copy:
+        content: |
+          /var/log/automation-alchemy/*.log {
+              daily
+              missingok
+              rotate 7
+              compress
+              delaycompress
+              notifempty
+              create 0644 {{ admin_user }} {{ admin_user }}
+          }
+        dest: /etc/logrotate.d/automation-alchemy
+        mode: '0644'
+
+  handlers:
+    - name: wait_for_ssh
+      wait_for:
+        port: 22
+        delay: 10
+        timeout: 30
+

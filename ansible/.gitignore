@@ -1,0 +1,14 @@
+# Ansible specific ignores
+*.retry
+.vault_pass
+vault.yml
+*.log
+
+# Inventory with real IPs (if you create dynamic inventory)
+inventory/vms.json
+inventory/*.json
+!inventory/hosts.yml.example
+
+# Ansible facts cache
+/tmp/ansible_facts/
+

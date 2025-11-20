@@ -63,45 +63,62 @@ This document tracks what has been completed, what's in progress, and what's nex
 
 ### Current Status
 
-**Phase 1 Complete**: Infrastructure is deployed and accessible. VM is running at `136.119.159.22`.
+**Phase 1 Complete**: Infrastructure is deployed and accessible. VM is running at `34.88.104.254`.
 
 **Cost**: $0/month (using free tier)
 
 **VM Details**:
-- External IP: `136.119.159.22`
+- External IP: `34.88.104.254`
 - Internal IP: `10.0.0.2`
 - SSH User: `devops`
 - Status: ✅ Running and accessible
+- Region: `europe-north1-a` (migrated from us-central1)
 
 ---
 
-## 🚧 Phase 2: Configuration Management (Ansible) - PENDING
+## ✅ Phase 2: Configuration Management (Ansible) - COMPLETE
 
-### Planned Tasks
+### Completed Tasks
 
-- [ ] **Ansible Setup**
-  - Create `ansible/` directory structure
-  - Create inventory file (from Terraform outputs)
-  - Create playbooks for:
-    - Common setup (users, packages, updates)
-    - Docker installation
-    - Firewall configuration
-    - Security hardening
-    - Application deployment
-    - Jenkins setup (if vm_count >= 5)
+- [x] **Ansible Setup**
+  - Created `ansible/` directory structure
+  - Created inventory file (from Terraform outputs)
+  - Created playbooks for:
+    - Common setup (users, packages, updates) ✅
+    - Docker installation ✅
+    - Firewall configuration ✅
+    - Security hardening ✅
+    - Application deployment ✅
+  - Fixed SSH key permissions for WSL
+  - Fixed docker_compose_v2 module issue (using shell command)
+  - Ansible connection verified (ping successful)
 
-- [ ] **VM Configuration**
-  - Install Docker on VMs
-  - Configure UFW firewall
-  - Create users and permissions
-  - Security hardening (fail2ban, SSH config)
-  - Deploy application containers
+- [x] **VM Configuration**
+  - Docker installed and running on VM ✅
+  - UFW firewall configured ✅
+  - Security hardening applied (fail2ban, SSH config) ✅
+  - Application containers deployed and healthy ✅
+  - All 5 containers running: app-server, web-server-1, web-server-2, load-balancer, netdata ✅
 
-- [ ] **Testing**
-  - Verify all VMs are accessible
-  - Test Docker installation
-  - Test application deployment
-  - Verify security configurations
+- [x] **Testing & Fixes**
+  - Fixed file path issues in app-deploy.yml ✅
+  - Fixed Docker group issue in common.yml ✅
+  - Fixed health check for nginx containers (process check instead of wget) ✅
+  - Fixed Ansible template escaping for docker ps command ✅
+  - All containers verified healthy ✅
+
+### Current Status
+
+**Phase 2 Complete**: VM is fully configured, Docker is running, and all application containers are healthy.
+
+**Containers Running**:
+- `app-server`: ✅ Healthy (port 3000)
+- `web-server-1`: ✅ Healthy (port 8081)
+- `web-server-2`: ✅ Healthy (port 8082)
+- `load-balancer`: ✅ Running (port 8080)
+- `netdata`: ✅ Healthy (port 19999)
+
+**Application Accessible**: `http://34.88.104.254:8080`
 
 ---
 
@@ -212,14 +229,14 @@ This document tracks what has been completed, what's in progress, and what's nex
 | Phase | Status | Progress |
 |-------|--------|----------|
 | Phase 1: Terraform | ✅ Complete | 100% ✅ |
-| Phase 2: Ansible | ⏳ Pending | 0% |
+| Phase 2: Ansible | ✅ Complete | 100% ✅ |
 | Phase 3: GitLab CI | ⏳ Pending | 0% |
 | Phase 4: Testing | ⏳ Pending | 0% |
 | Phase 5: Alerts | ⏳ Pending | 0% |
 | Phase 6: Rollback | ⏳ Pending | 0% |
 | Phase 7: One-Click | ⏳ Pending | 0% |
 
-**Overall Progress**: ~14% (1 of 7 phases complete) ✅ Phase 1 deployed successfully!
+**Overall Progress**: ~29% (Phase 1 & 2 complete!) ✅ Infrastructure deployed and configured!
 
 ---
 
@@ -246,6 +263,14 @@ This document tracks what has been completed, what's in progress, and what's nex
 - **Windows Path Issues**: Fixed SSH key path to use full Windows path
 - **Terraform Functions**: Fixed `fileexists()` to use `try(file(), "")`
 - **Authentication**: Set up gcloud application default credentials
+- **Region Migration**: Migrated from us-central1 to europe-north1 (destroyed and recreated VM)
+- **Ansible on Windows**: Switched to WSL due to Windows compatibility issues
+- **SSH Key Permissions**: Fixed WSL permissions (copied key to WSL home, set 600)
+- **Ansible Module Issues**: Fixed docker_compose_v2 module (switched to shell command)
+- **Docker Group Issue**: Removed docker group from common.yml (added in docker.yml instead)
+- **File Path Issues**: Fixed Ansible file paths using `{{ playbook_dir }}/../../`
+- **Health Check Issues**: Fixed nginx health checks (process check instead of wget)
+- **Template Escaping**: Fixed Ansible template variables in docker ps command
 
 ### Lessons Learned
 
@@ -256,7 +281,7 @@ This document tracks what has been completed, what's in progress, and what's nex
 ---
 
 **Last Updated**: 2025-11-20  
-**Current Phase**: Phase 1 Complete ✅, Ready for Phase 2 (Ansible)
+**Current Phase**: Phase 1 & 2 Complete ✅✅ | Ready for Phase 3 (GitLab CI)
 
 ---
 

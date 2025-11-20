@@ -1,0 +1,95 @@
+---
+# Common Setup Playbook
+# Sets up basic system configuration: users, packages, updates
+
+- name: Common system setup
+  hosts: all
+  become: yes
+  vars:
+    admin_user: devops
+    admin_groups: sudo,docker
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        autoremove: yes
+        autoclean: yes
+
+    - name: Install essential packages
+      apt:
+        name:
+          - curl
+          - wget
+          - git
+          - vim
+          - htop
+          - net-tools
+          - ufw
+          - fail2ban
+          - unattended-upgrades
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Ensure admin user exists
+      user:
+        name: "{{ admin_user }}"
+        groups: "{{ admin_groups }}"
+        shell: /bin/bash
+        create_home: yes
+        state: present
+
+    - name: Set up sudoers for admin user
+      lineinfile:
+        path: /etc/sudoers.d/{{ admin_user }}
+        line: "{{ admin_user }} ALL=(ALL) NOPASSWD: ALL"
+        create: yes
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    - name: Configure automatic security updates
+      apt:
+        name: unattended-upgrades
+        state: present
+
+    - name: Enable automatic security updates
+      copy:
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+          APT::Periodic::AutocleanInterval "7";
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        mode: '0644'
+
+    - name: Set timezone
+      timezone:
+        name: Europe/Tallinn
+
+    - name: Configure hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Ensure /opt/app directory exists
+      file:
+        path: /opt/app
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+
+    - name: Create log directory
+      file:
+        path: /var/log/automation-alchemy
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+

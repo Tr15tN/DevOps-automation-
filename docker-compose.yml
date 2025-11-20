@@ -29,10 +29,11 @@ services:
     ports:
       - "8081:80"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      test: ["CMD", "sh", "-c", "test -f /var/run/nginx.pid && kill -0 $(cat /var/run/nginx.pid)"]
       interval: 10s
       timeout: 3s
-      retries: 5
+      retries: 3
+      start_period: 10s
 
   web-server-2:
     image: nginx:1.25-alpine
@@ -47,10 +48,11 @@ services:
     ports:
       - "8082:80"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      test: ["CMD", "sh", "-c", "test -f /var/run/nginx.pid && kill -0 $(cat /var/run/nginx.pid)"]
       interval: 10s
       timeout: 3s
-      retries: 5
+      retries: 3
+      start_period: 10s
 
   load-balancer:
     image: haproxy:2.8-alpine

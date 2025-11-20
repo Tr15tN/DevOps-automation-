@@ -1,0 +1,110 @@
+---
+# Application Deployment Playbook
+# Deploys the application using Docker Compose
+
+- name: Deploy application
+  hosts: all
+  become: yes
+  vars:
+    app_user: devops
+    app_dir: /opt/app
+    project_name: automation-alchemy
+
+  tasks:
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+
+    - name: Copy docker-compose.yml
+      copy:
+        src: "{{ playbook_dir }}/../../docker-compose.yml"
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+
+    - name: Create configs directory structure
+      file:
+        path: "{{ app_dir }}/{{ item }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+      loop:
+        - configs/haproxy
+        - configs/nginx
+
+    - name: Copy HAProxy configuration
+      copy:
+        src: "{{ playbook_dir }}/../../configs/haproxy/haproxy.cfg"
+        dest: "{{ app_dir }}/configs/haproxy/haproxy.cfg"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+
+    - name: Copy NGINX configurations
+      copy:
+        src: "{{ playbook_dir }}/../../configs/nginx/{{ item }}"
+        dest: "{{ app_dir }}/configs/nginx/{{ item }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+      loop:
+        - nginx1.conf
+        - nginx2.conf
+
+    - name: Create web-content directory
+      file:
+        path: "{{ app_dir }}/web-content"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+
+    - name: Copy web content
+      copy:
+        src: "{{ playbook_dir }}/../../web-content/"
+        dest: "{{ app_dir }}/web-content/"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+
+    - name: Copy docker directory
+      copy:
+        src: "{{ playbook_dir }}/../../docker/"
+        dest: "{{ app_dir }}/docker/"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0644'
+
+    - name: Build and start containers
+      shell: |
+        cd {{ app_dir }}
+        docker compose up -d --build
+      become_user: "{{ app_user }}"
+      environment:
+        COMPOSE_PROJECT_NAME: "{{ project_name }}"
+
+    - name: Wait for services to be healthy
+      wait_for:
+        port: "{{ item }}"
+        host: localhost
+        delay: 5
+        timeout: 60
+      loop:
+        - 8080  # Load balancer
+        - 3000  # App server
+
+    - name: Verify containers are running
+      shell: docker ps --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}"
+      register: docker_ps
+      changed_when: false
+
+    - name: Display running containers
+      debug:
+        msg: "{{ docker_ps.stdout_lines }}"
+

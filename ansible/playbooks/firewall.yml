@@ -1,0 +1,75 @@
+---
+# Firewall Configuration Playbook
+# Configures UFW firewall with necessary rules
+
+- name: Configure firewall
+  hosts: all
+  become: yes
+  vars:
+    # Allow SSH from anywhere (restrict in production)
+    ssh_allowed: "0.0.0.0/0"
+    # Internal subnet
+    internal_subnet: "10.0.0.0/24"
+
+  tasks:
+    - name: Reset UFW to defaults
+      ufw:
+        state: reset
+      when: false  # Don't reset on first run
+
+    - name: Set UFW default policies
+      ufw:
+        direction: "{{ item.direction }}"
+        policy: "{{ item.policy }}"
+      loop:
+        - { direction: 'incoming', policy: 'deny' }
+        - { direction: 'outgoing', policy: 'allow' }
+
+    - name: Allow SSH
+      ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+        src: "{{ ssh_allowed }}"
+        comment: "Allow SSH access"
+
+    - name: Allow HTTP
+      ufw:
+        rule: allow
+        port: "80"
+        proto: tcp
+        comment: "Allow HTTP"
+
+    - name: Allow application ports
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+        comment: "Allow application port {{ item }}"
+      loop:
+        - "3000"  # App server
+        - "8080"  # Load balancer
+        - "8081"  # Web server 1
+        - "8082"  # Web server 2
+        - "8404"  # HAProxy stats
+        - "19999" # Netdata
+
+    - name: Allow internal subnet communication
+      ufw:
+        rule: allow
+        from: "{{ internal_subnet }}"
+        comment: "Allow internal subnet communication"
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+
+    - name: Display UFW status
+      command: ufw status verbose
+      register: ufw_status
+      changed_when: false
+
+    - name: Show firewall status
+      debug:
+        msg: "{{ ufw_status.stdout_lines }}"
+
