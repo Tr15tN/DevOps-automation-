@@ -9,6 +9,7 @@ stages:
   - deploy
   - integration
   - healthcheck
+  - rollback
 
 variables:
   # GCP Configuration

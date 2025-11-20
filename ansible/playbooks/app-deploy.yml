@@ -97,6 +97,26 @@
       when: app_server_image is defined and ('gcr.io' in app_server_image or 'pkg.dev' in app_server_image)
       ignore_errors: yes
 
+    - name: Save current version before deployment
+      shell: |
+        if [ -f {{ app_dir }}/.deployed-version ]; then
+          cp {{ app_dir }}/.deployed-version {{ app_dir }}/.previous-version || true
+        fi
+      become_user: "{{ app_user }}"
+      ignore_errors: yes
+
+    - name: Extract version from image tag
+      shell: |
+        echo "{{ app_server_image }}" | sed 's/.*:\(.*\)$/\1/'
+      register: image_version
+      changed_when: false
+
+    - name: Save deployed version
+      shell: |
+        echo "{{ image_version.stdout }}" > {{ app_dir }}/.deployed-version
+      become_user: "{{ app_user }}"
+      when: image_version.stdout is defined
+
     - name: Build and start containers
       shell: |
         cd {{ app_dir }}
