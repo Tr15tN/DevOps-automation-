@@ -1,58 +1,42 @@
 # Documentation Index
 
-This directory contains planning, analysis, and setup documentation for the Automation Alchemy project.
+This directory contains all documentation for the Automation Alchemy project.
 
-## 🎯 What and Why
+## 🚀 Getting Started
 
-See **[what-and-why/](what-and-why/)** directory for documentation explaining what we've done and why we made those decisions.
+1. **[Installation Guide](INSTALLATION_GUIDE.md)** - Install required tools (or let the script do it!)
+2. **[GCP Beginner Setup](GCP_BEGINNER_SETUP.md)** - Set up your GCP account
+3. **[Deployment Workflow](DEPLOYMENT_WORKFLOW.md)** - How to deploy (local & CI/CD)
 
-**Key Documents**:
-- [TERRAFORM_SETUP.md](what-and-why/TERRAFORM_SETUP.md) - Complete Terraform explanation
-- [PROJECT_PROGRESS.md](what-and-why/PROJECT_PROGRESS.md) - Current status and progress
-- [ARCHITECTURE_DECISIONS.md](what-and-why/ARCHITECTURE_DECISIONS.md) - All decisions and rationale
+## 📚 Essential Guides
 
----
+### Setup & Installation
+- **[Installation Guide](INSTALLATION_GUIDE.md)** - Tool installation (with auto-installation info)
+- **[GCP Beginner Setup](GCP_BEGINNER_SETUP.md)** - GCP account setup for beginners
 
-## 📋 Planning & Analysis
+### Deployment
+- **[Deployment Workflow](DEPLOYMENT_WORKFLOW.md)** - Complete deployment guide with troubleshooting
+- **[GitLab CI Setup](GITLAB_CI_SETUP.md)** - Configure GitLab CI/CD pipeline
 
-### [BASELINE_ANALYSIS.md](BASELINE_ANALYSIS.md)
-Analysis of whether the existing Infrastructure Insight project can serve as a baseline for Automation Alchemy. Includes tool selection rationale and what to keep/change.
+### Technical Details
+- **[Terraform Setup](what-and-why/TERRAFORM_SETUP.md)** - Infrastructure configuration details
+- **[Architecture Decisions](what-and-why/ARCHITECTURE_DECISIONS.md)** - Why we made certain choices
+- **[Project Progress](what-and-why/PROJECT_PROGRESS.md)** - Development history and milestones
 
-### [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
-Detailed step-by-step implementation plan with tool selection, architecture design, and phase-by-phase breakdown.
+## 🎯 Quick Reference
 
-### [FUTURE_PROJECT_ANALYSIS.md](FUTURE_PROJECT_ANALYSIS.md)
-Analysis of the future "Voyager" cloud migration project requirements and how they impact our current project decisions.
+**For first-time setup:**
+1. Read [GCP Beginner Setup](GCP_BEGINNER_SETUP.md)
+2. Read [Installation Guide](INSTALLATION_GUIDE.md) (or just run the script!)
+3. Run `./scripts/deploy.sh` - it will guide you through everything
 
-## 💰 Cost Management
+**For deployment:**
+- Local: See [Deployment Workflow](DEPLOYMENT_WORKFLOW.md)
+- CI/CD: See [GitLab CI Setup](GITLAB_CI_SETUP.md)
 
-### [COST_OPTIMIZATION_STRATEGY.md](COST_OPTIMIZATION_STRATEGY.md)
-Comprehensive cost analysis comparing cloud providers, free tier options, and strategies to minimize costs.
-
-## 🚀 Setup Guides
-
-### [GCP_BEGINNER_SETUP.md](GCP_BEGINNER_SETUP.md)
-**Start here if you're new to cloud services!** Step-by-step guide for setting up Google Cloud Platform account, project, and billing with beginner-friendly explanations.
-
-### [GCP_SETUP_GUIDE.md](GCP_SETUP_GUIDE.md)
-Quick reference guide for GCP setup, including API enablement and CLI installation.
-
----
-
-## 📖 Reading Order (Recommended)
-
-1. **BASELINE_ANALYSIS.md** - Understand the project foundation
-2. **FUTURE_PROJECT_ANALYSIS.md** - See why we chose cloud approach
-3. **IMPLEMENTATION_PLAN.md** - Review the implementation strategy
-4. **COST_OPTIMIZATION_STRATEGY.md** - Understand cost implications
-5. **GCP_BEGINNER_SETUP.md** - Set up your GCP account (if new to cloud)
-6. **GCP_SETUP_GUIDE.md** - Quick reference for GCP setup
+**For troubleshooting:**
+- See [Deployment Workflow](DEPLOYMENT_WORKFLOW.md) - Troubleshooting section
 
 ---
 
-## 🎯 Quick Links
-
-- **New to cloud?** → Start with [GCP_BEGINNER_SETUP.md](GCP_BEGINNER_SETUP.md)
-- **Want to understand costs?** → Read [COST_OPTIMIZATION_STRATEGY.md](COST_OPTIMIZATION_STRATEGY.md)
-- **Ready to implement?** → Follow [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)
-
+**Last Updated**: 2025-01-XX
