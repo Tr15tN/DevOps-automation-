@@ -58,14 +58,14 @@
 └─────────────────────────────────────────┘
 ```
 
-### Current Setup
+### Current Setup (Phase 1 & 2 Complete)
 
 - **Region**: `europe-north1` (Finland) - Optimized for Estonia
 - **VM Count**: 1 (configurable: 1, 4, or 5)
 - **Machine Type**: `e2-micro` (Free tier eligible)
 - **Cost**: $0/month (using free tier)
-- **Deployment**: ✅ Interactive menu with auto-installation
-- **Features**: ✅ Auto-installs missing tools, auto-configures GCP auth, handles encoding
+- **Application**: ✅ Running at `http://34.88.104.254:8080`
+- **Containers**: ✅ All 5 containers healthy (app-server, web-server-1, web-server-2, load-balancer, netdata)
 
 ---
 
@@ -85,67 +85,46 @@ For Phase 2+:
 
 ## 🚀 Quick Start
 
-### 🎯 One-Click Deployment (✅ Complete)
+### 🎯 One-Click Deployment (Phase 7 - ✅ Complete)
 
 **Deploy everything with a single command!**
 
-#### Recommended: WSL (Windows Subsystem for Linux)
-```bash
-# Open WSL
-wsl
-
-# Navigate to project
-cd /mnt/c/automation-alchemy
-
-# Run deployment (it will install missing tools automatically)
-./scripts/deploy.sh
-```
-
-#### Alternative: Git Bash (Windows)
-```bash
-./scripts/deploy.sh
-```
-
-#### Windows PowerShell
+#### Windows (PowerShell)
 ```powershell
 .\scripts\deploy.ps1
 ```
 
+#### Linux/Mac/Git Bash
+```bash
+./scripts/deploy.sh
+```
+
 **What it does:**
-1. ✅ **Detects environment** and missing tools
-2. ✅ **Offers to install** missing tools automatically (Terraform, Ansible, jq)
-3. ✅ **Checks GCP authentication** and sets up if needed
-4. ✅ **Validates prerequisites** (Terraform, gcloud, Ansible)
-5. ✅ **Checks/creates Terraform configuration**
-6. ✅ **Generates SSH keys** if needed
-7. ✅ **Provisions infrastructure** with Terraform
-8. ✅ **Automatically starts VM** if stopped
-9. ✅ **Updates Ansible inventory** automatically
-10. ✅ **Configures VMs** with Ansible (handles encoding automatically)
-11. ✅ **Verifies deployment** and shows application URLs
+1. ✅ Validates prerequisites (Terraform, gcloud, Ansible)
+2. ✅ Checks/creates Terraform configuration
+3. ✅ Generates SSH keys if needed
+4. ✅ Provisions infrastructure with Terraform
+5. ✅ Updates Ansible inventory automatically
+6. ✅ Configures VMs with Ansible
+7. ✅ Verifies deployment and shows application URLs
 
-**Auto-Installation:**
-The script automatically detects and can install:
-- ✅ Terraform (WSL/Ubuntu/Arch)
-- ✅ Ansible (WSL/Ubuntu/Arch)
-- ✅ jq (WSL/Ubuntu/Arch)
-- ✅ Provides instructions for gcloud CLI
+**Options:**
+```powershell
+# Skip Terraform (only run Ansible)
+.\scripts\deploy.ps1 -SkipTerraform
 
-**What the Script Does Automatically:**
-- ✅ **Detects environment** (WSL, Git Bash, Linux)
-- ✅ **Checks for missing tools** (Terraform, Ansible, jq, gcloud)
-- ✅ **Offers to install** missing tools automatically
-- ✅ **Checks GCP authentication** and sets up if needed
-- ✅ **Starts VM** if it's stopped
-- ✅ **Handles encoding** issues automatically
-- ✅ **Updates inventory** with VM IP
+# Skip Ansible (only run Terraform)
+.\scripts\deploy.ps1 -SkipAnsible
+
+# Destroy infrastructure
+.\scripts\deploy.ps1 -Destroy
+```
 
 **Prerequisites:**
-- WSL (recommended) or Git Bash
-- GCP account with project created
+- Terraform installed
+- gcloud CLI installed and authenticated
+- Ansible installed
 - `terraform/terraform.tfvars` configured with your `project_id`
-
-**Note**: The script will guide you through everything! Just run it and follow the prompts.
 
 ---
 
@@ -529,16 +508,24 @@ By completing this project, you'll learn:
 
 ---
 
+## 🚀 Next Steps
+
+1. ✅ **Phase 1 Complete**: Infrastructure provisioned
+2. ✅ **Phase 2 Complete**: Ansible configuration and application deployment
+3. 📋 **Phase 3**: Configure GitLab CI pipeline
+4. 📋 **Phase 4-7**: Testing, alerts, rollback, one-click deployment
+
+See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed next steps.
+
 ## 🏆 Success Criteria
 
 - ✅ Infrastructure provisioned with Terraform
 - ✅ VMs accessible and configured
 - ✅ Ansible automation complete (Docker, firewall, security, app deployment)
 - ✅ Application deployed and healthy (all containers running)
-- ✅ CI/CD pipeline functional (GitLab CI)
-- ✅ Automated testing integrated
-- ✅ One-click deployment working (interactive menu)
-- ✅ Auto-installation of missing tools
+- 📋 CI/CD pipeline functional (Phase 3)
+- 📋 Automated testing integrated (Phase 4)
+- 📋 One-click deployment working (Phase 7)
 - ✅ Cost optimized (free tier)
 
 ---

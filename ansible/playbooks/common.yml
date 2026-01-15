@@ -8,6 +8,11 @@
   vars:
     admin_user: devops
     admin_groups: sudo,docker
+  pre_tasks:
+    - name: Wait for SSH to become available
+      wait_for_connection:
+        timeout: 300
+        sleep: 5
 
   tasks:
     - name: Update apt cache

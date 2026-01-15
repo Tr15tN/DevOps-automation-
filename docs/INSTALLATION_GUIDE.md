@@ -1,31 +1,13 @@
-# Installation Guide
+# Installation Guide - Windows & Arch Linux
 
-This guide covers installing all required tools. **Note**: The deployment script can automatically install most tools for you!
+This guide covers installing all required tools for both Windows and Arch Linux.
 
 ## 🛠️ Required Tools
 
-- **Terraform** - Infrastructure as Code (auto-installable)
-- **gcloud CLI** - Google Cloud SDK (required)
-- **Ansible** - Configuration management (auto-installable)
-- **jq** - JSON processor (optional, auto-installable)
+- **Terraform** - Infrastructure as Code
+- **gcloud CLI** - Google Cloud SDK (optional but recommended)
+- **Ansible** - Configuration management (coming in Phase 2)
 - **Git** - Version control
-
-## 🚀 Quick Start (Recommended)
-
-**Just run the deployment script - it will install missing tools automatically:**
-
-```bash
-# In WSL
-wsl
-cd /mnt/c/automation-alchemy
-./scripts/deploy.sh
-```
-
-The script will:
-- ✅ Detect your environment
-- ✅ Check for missing tools
-- ✅ Offer to install them automatically
-- ✅ Guide you through GCP authentication
 
 ---
 
@@ -107,7 +89,7 @@ gcloud config set project YOUR_PROJECT_ID
 
 **Windows Note:** Ansible doesn't run natively on Windows. Options:
 
-**Option 1: WSL2 (Recommended) ✅**
+**Option 1: WSL2 (Recommended)**
 ```powershell
 # Install WSL2
 wsl --install
@@ -115,14 +97,6 @@ wsl --install
 # Then in WSL (Ubuntu):
 sudo apt update
 sudo apt install ansible -y
-```
-
-**Or use the deployment script** - it will install Ansible automatically:
-```bash
-# In WSL
-cd /mnt/c/automation-alchemy
-./scripts/deploy.sh
-# Script will detect missing Ansible and offer to install it
 ```
 
 **Option 2: Use Ansible from Arch Linux**
