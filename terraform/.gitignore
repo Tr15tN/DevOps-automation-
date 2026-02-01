@@ -5,6 +5,10 @@
 *.tfstate
 *.tfstate.*
 
+# Plan files (local, not for commit)
+tfplan
+*.tfplan
+
 # Crash log files
 crash.log
 crash.*.log

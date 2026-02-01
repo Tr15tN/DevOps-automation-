@@ -202,7 +202,7 @@ After Ansible completes:
 3. ✅ Firewall is configured
 4. ✅ Security is hardened
 5. ✅ Application is deployed
-6. ➡️ **Next**: Phase 3 (GitLab CI)
+6. **Next**: Set up GitLab CI (see docs/GITLAB_CI_SETUP.md)
 
 ---
 

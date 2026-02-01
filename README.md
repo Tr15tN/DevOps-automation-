@@ -45,10 +45,7 @@
 │  │  (VM)    │  │  (VM)    │            │
 │  └──────────┘  └──────────┘            │
 │                                        │
-│  ┌──────────┐                         │
-│  │ Jenkins │                         │
-│  │  (VM)   │                         │
-│  └──────────┘                         │
+│  (GitLab CI runs externally)          │
 └─────────────────────────────────────────┘
         │
         ▼
@@ -58,14 +55,14 @@
 └─────────────────────────────────────────┘
 ```
 
-### Current Setup (Phase 1 & 2 Complete)
+### Current Setup
 
 - **Region**: `europe-north1` (Finland) - Optimized for Estonia
 - **VM Count**: 1 (configurable: 1, 4, or 5)
 - **Machine Type**: `e2-micro` (Free tier eligible)
 - **Cost**: $0/month (using free tier)
-- **Application**: ✅ Running at `http://34.88.104.254:8080`
-- **Containers**: ✅ All 5 containers healthy (app-server, web-server-1, web-server-2, load-balancer, netdata)
+- **Application**: `http://34.88.104.254:8080`
+- **Containers**: app-server, web-server-1, web-server-2, load-balancer, netdata
 
 ---
 
@@ -77,17 +74,16 @@
 - **GCP Account** with project created ([Setup Guide](docs/GCP_BEGINNER_SETUP.md))
 - **SSH Key** (will be generated if missing)
 
-For Phase 2+:
-- **Ansible** (for configuration management) ✅ Installed
-- **GitLab Account** (for CI/CD) - Next phase
+- **Ansible** (for configuration management)
+- **GitLab Account** (for CI/CD)
 
 ---
 
 ## 🚀 Quick Start
 
-### 🎯 One-Click Deployment (Phase 7 - ✅ Complete)
+### One-Click Deployment
 
-**Deploy everything with a single command!**
+**Deploy everything with a single command:**
 
 #### Windows (PowerShell)
 ```powershell
@@ -100,13 +96,13 @@ For Phase 2+:
 ```
 
 **What it does:**
-1. ✅ Validates prerequisites (Terraform, gcloud, Ansible)
-2. ✅ Checks/creates Terraform configuration
-3. ✅ Generates SSH keys if needed
-4. ✅ Provisions infrastructure with Terraform
-5. ✅ Updates Ansible inventory automatically
-6. ✅ Configures VMs with Ansible
-7. ✅ Verifies deployment and shows application URLs
+1. Validates prerequisites (Terraform, gcloud, Ansible)
+2. Checks/creates Terraform configuration
+3. Generates SSH keys if needed
+4. Provisions infrastructure with Terraform
+5. Updates Ansible inventory automatically
+6. Configures VMs with Ansible
+7. Verifies deployment and shows application URLs
 
 **Options:**
 ```powershell
@@ -128,7 +124,7 @@ For Phase 2+:
 
 ---
 
-### Phase 1: Infrastructure Provisioning (✅ Complete)
+### Infrastructure Provisioning
 
 1. **Set up GCP Account**
    ```bash
@@ -161,7 +157,7 @@ For Phase 2+:
    terraform output
    ```
 
-### Phase 2: Configuration Management (✅ Complete)
+### Configuration Management
 
 1. **Update Ansible Inventory**
    ```bash
@@ -187,7 +183,7 @@ For Phase 2+:
    curl http://<EXTERNAL_IP>:8080
    ```
 
-### Phase 4: Testing Integration (🔄 In Progress)
+### Testing
 
 1. **Run Tests Locally**
    ```bash
@@ -227,54 +223,6 @@ terraform output vm_instances
 
 ---
 
-## 📊 Project Status
-
-### ✅ Phase 1: Infrastructure as Code (Terraform) - COMPLETE
-
-- [x] Terraform configuration created
-- [x] GCP infrastructure provisioned
-- [x] VPC, subnet, firewall rules configured
-- [x] VM instance running in Europe (europe-north1)
-- [x] SSH access configured
-- [x] Cost optimized (free tier)
-
-**Current VM**: `automation-alchemy` at `34.88.104.254` (europe-north1-a)  
-**Application**: ✅ Running at `http://34.88.104.254:8080`  
-**Containers**: ✅ All 5 containers healthy (app-server, web-server-1, web-server-2, load-balancer, netdata)
-
-### ✅ Phase 2: Configuration Management (Ansible) - COMPLETE
-
-- [x] Ansible playbooks created
-- [x] Inventory configured (from Terraform outputs)
-- [x] SSH connection working
-- [x] Docker installation automated ✅
-- [x] Firewall configuration automated ✅
-- [x] Security hardening automated ✅
-- [x] Application deployment automated ✅
-- [x] All containers healthy and running ✅
-
-### ✅ Phase 3: CI/CD Pipeline (GitLab CI) - COMPLETE
-
-- [x] GitLab project setup ✅
-- [x] CI/CD pipeline configuration ✅
-- [x] Docker image build and push to Artifact Registry ✅
-- [x] Automated deployment via Ansible ✅
-- [x] Health check stage ✅
-- [x] End-to-end pipeline tested and working ✅
-
-### 🔄 Phase 4: Testing Integration - IN PROGRESS
-
-- [x] Code quality tests (ESLint + ShellCheck) ✅
-- [x] Security scanning (Trivy) ✅
-- [x] Performance tests (load testing) ✅
-- [x] Integration tests (API endpoints) ✅
-- [x] All tests integrated into CI pipeline ✅
-- [ ] Pipeline testing (pending CI run)
-
-### 📋 Phase 4-7: Testing, Alerts, Rollback, One-Click - PLANNED
-
-See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed status.
-
 ---
 
 ## 📁 Project Structure
@@ -289,7 +237,7 @@ automation-alchemy/
 │   ├── versions.tf            # Provider versions
 │   └── terraform.tfvars        # Your configuration
 │
-├── ansible/                    # Configuration Management (Phase 2) ✅
+├── ansible/                    # Configuration Management
 │   ├── playbooks/              # Ansible playbooks
 │   │   ├── site.yml           # Main playbook
 │   │   ├── common.yml          # Common setup
@@ -300,14 +248,14 @@ automation-alchemy/
 │   ├── inventory/              # VM inventory
 │   └── ansible.cfg             # Ansible configuration
 │
-├── tests/                      # Testing Framework (Phase 4) 🔄
+├── tests/                      # Testing (code quality, security, integration, performance)
 │   ├── code-quality.sh         # ESLint + ShellCheck
 │   ├── security-scan.sh        # Trivy security scanning
 │   ├── performance-test.sh     # Load testing
 │   ├── integration-test.sh     # API & E2E tests
 │   └── README.md               # Test documentation
 │
-├── .gitlab-ci.yml              # GitLab CI pipeline (Phase 3)
+├── .gitlab-ci.yml              # GitLab CI pipeline
 │
 ├── docker/                     # Application code
 │   └── app-server/            # Node.js backend
@@ -320,8 +268,9 @@ automation-alchemy/
 │   └── index.html
 │
 ├── scripts/                    # Automation scripts
-│   ├── install_docker.sh      # Docker installation
-│   ├── configure_firewall.sh  # Firewall setup
+│   ├── deploy.ps1 / deploy.sh # One-click deployment
+│   ├── rollback.sh            # Rollback deployment
+│   ├── version-manager.sh     # Version history
 │   └── backup/                # Backup scripts
 │
 └── docs/                       # Documentation
@@ -332,19 +281,19 @@ automation-alchemy/
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
-| Component | Technology | Status |
-|-----------|-----------|--------|
-| **Infrastructure** | Terraform + GCP | ✅ Complete |
-| **Configuration** | Ansible | ✅ Complete |
-| **CI/CD** | GitLab CI | 📋 Planned |
-| **Cloud Provider** | Google Cloud Platform | ✅ Complete |
-| **Containerization** | Docker | ✅ Complete |
-| **Load Balancer** | HAProxy | ✅ Complete |
-| **Web Server** | NGINX | ✅ Complete |
-| **Backend** | Node.js + Express | ✅ Complete |
-| **Monitoring** | Netdata | ✅ Complete |
+| Component | Technology |
+|-----------|------------|
+| **Infrastructure** | Terraform + GCP |
+| **Configuration** | Ansible |
+| **CI/CD** | GitLab CI |
+| **Cloud Provider** | Google Cloud Platform |
+| **Containerization** | Docker |
+| **Load Balancer** | HAProxy |
+| **Web Server** | NGINX |
+| **Backend** | Node.js + Express |
+| **Monitoring** | Netdata |
 
 ---
 
@@ -362,9 +311,7 @@ automation-alchemy/
 - **4 VMs**: ~$21/month (1 free + 3 paid)
 - **5 VMs**: ~$28/month (1 free + 4 paid)
 
-**Note**: With $300 GCP credit, you get ~14 months free!
-
-See [Cost Optimization Strategy](docs/COST_OPTIMIZATION_STRATEGY.md) for details.
+**Note**: With $300 GCP credit, you get ~14 months free.
 
 ---
 
@@ -373,15 +320,10 @@ See [Cost Optimization Strategy](docs/COST_OPTIMIZATION_STRATEGY.md) for details
 ### Quick Links
 
 - **New to cloud?** → [GCP Beginner Setup](docs/GCP_BEGINNER_SETUP.md)
-- **Want to understand decisions?** → [What and Why](docs/what-and-why/)
-- **Need installation help?** → [Installation Guide](docs/INSTALLATION_GUIDE.md)
-- **Check progress?** → [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md)
-
-### Key Documents
-
-- [Terraform Setup](docs/what-and-why/TERRAFORM_SETUP.md) - Complete infrastructure explanation
-- [Architecture Decisions](docs/what-and-why/ARCHITECTURE_DECISIONS.md) - Why we chose what we did
-- [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) - Detailed progress tracking
+- **Understand decisions?** → [What and Why](docs/what-and-why/)
+- **Installation help?** → [Installation Guide](docs/INSTALLATION_GUIDE.md)
+- [Terraform Setup](docs/what-and-why/TERRAFORM_SETUP.md) – Infrastructure explanation
+- [Architecture Decisions](docs/what-and-why/ARCHITECTURE_DECISIONS.md) – Rationale for choices
 
 ---
 
@@ -508,28 +450,6 @@ By completing this project, you'll learn:
 
 ---
 
-## 🚀 Next Steps
-
-1. ✅ **Phase 1 Complete**: Infrastructure provisioned
-2. ✅ **Phase 2 Complete**: Ansible configuration and application deployment
-3. 📋 **Phase 3**: Configure GitLab CI pipeline
-4. 📋 **Phase 4-7**: Testing, alerts, rollback, one-click deployment
-
-See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed next steps.
-
-## 🏆 Success Criteria
-
-- ✅ Infrastructure provisioned with Terraform
-- ✅ VMs accessible and configured
-- ✅ Ansible automation complete (Docker, firewall, security, app deployment)
-- ✅ Application deployed and healthy (all containers running)
-- 📋 CI/CD pipeline functional (Phase 3)
-- 📋 Automated testing integrated (Phase 4)
-- 📋 One-click deployment working (Phase 7)
-- ✅ Cost optimized (free tier)
-
----
-
 ## 🔗 Useful Links
 
 - [Terraform Documentation](https://www.terraform.io/docs)
@@ -540,12 +460,4 @@ See [Project Progress](docs/what-and-why/PROJECT_PROGRESS.md) for detailed next 
 
 ---
 
-**Ready to automate? Start with `terraform apply` and watch your infrastructure come to life! 🚀**
-
-**Current Status**: Phase 1, 2 & 3 Complete ✅✅✅ | Phase 4 (Testing) In Progress 🔄
-
-**Application Live**: `http://34.88.104.254:8080` 🎉
-
-**Last Updated**: 2025-11-20
-
-<!-- Pipeline test -->
+**Application**: `http://34.88.104.254:8080`

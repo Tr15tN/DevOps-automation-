@@ -6,7 +6,7 @@ This guide covers installing all required tools for both Windows and Arch Linux.
 
 - **Terraform** - Infrastructure as Code
 - **gcloud CLI** - Google Cloud SDK (optional but recommended)
-- **Ansible** - Configuration management (coming in Phase 2)
+- **Ansible** - Configuration management
 - **Git** - Version control
 
 ---
@@ -85,7 +85,7 @@ gcloud config set project YOUR_PROJECT_ID
 
 ---
 
-### Ansible (For Phase 2)
+### Ansible
 
 **Windows Note:** Ansible doesn't run natively on Windows. Options:
 

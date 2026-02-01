@@ -98,7 +98,7 @@ This document records the architectural decisions made during the project, inclu
 - ⚠️ Requires SSH access (but we have that)
 - ⚠️ Can be slow for large infrastructures (but we only have 4-5 VMs)
 
-**Status**: ⏳ Planned (Phase 2)
+**Status**: Implemented
 
 ---
 
@@ -130,7 +130,7 @@ This document records the architectural decisions made during the project, inclu
 - ⚠️ Less flexible than Jenkins for complex workflows
 - ⚠️ Requires GitLab (but can use GitLab.com free)
 
-**Status**: ⏳ Planned (Phase 3)
+**Status**: Implemented
 
 ---
 
@@ -326,8 +326,8 @@ This document records the architectural decisions made during the project, inclu
 |----------|---------------|--------|
 | Cloud Provider | GCP | ✅ Implemented |
 | IaC Tool | Terraform | ✅ Implemented |
-| Config Management | Ansible | ⏳ Planned |
-| CI/CD | GitLab CI | ⏳ Planned |
+| Config Management | Ansible | Implemented |
+| CI/CD | GitLab CI | Implemented |
 | Initial VM Count | 1 (scalable) | ✅ Implemented |
 | Machine Type | e2-micro | ✅ Implemented |
 | Network | Custom VPC | ✅ Implemented |
@@ -339,15 +339,5 @@ This document records the architectural decisions made during the project, inclu
 
 ## 📝 Update Reminder
 
-**This document should be updated:**
-- ✅ When making a new architectural decision
-- ✅ When changing an existing decision
-- ✅ When discovering new trade-offs
-- ✅ When completing each phase
-
-**Next Update**: After Phase 2 (Ansible) decisions
-
----
-
-**Last Updated**: 2025-11-20
+**This document should be updated when making or changing architectural decisions.**
 

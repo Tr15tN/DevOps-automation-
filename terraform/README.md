@@ -124,7 +124,7 @@ After `terraform apply`, you'll get:
 - Ansible inventory format
 - VPC network information
 
-Use these outputs to configure Ansible in the next phase.
+Use these outputs to configure Ansible (inventory).
 
 ## 🐛 Troubleshooting
 

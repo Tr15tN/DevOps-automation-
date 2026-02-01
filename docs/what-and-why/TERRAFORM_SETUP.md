@@ -160,7 +160,7 @@ This document explains the Terraform infrastructure setup for Automation Alchemy
 
 **Reasons**:
 1. **Security**: More secure than passwords
-2. **Automation**: Required for Ansible (next phase)
+2. **Automation**: Required for Ansible
 3. **Best Practice**: Standard for cloud infrastructure
 4. **No Password Management**: Keys are easier to manage
 
@@ -340,14 +340,9 @@ gcloud config set project automation-alchemy
 
 ---
 
-## 📚 Next Steps
+## Next Steps
 
-After Terraform creates infrastructure:
-1. ✅ VMs are provisioned
-2. ✅ Networking is configured
-3. ✅ Firewall rules are set
-4. ➡️ **Next Phase**: Configure VMs with Ansible
-5. ➡️ **After That**: Set up CI/CD with GitLab
+After Terraform creates infrastructure, configure VMs with Ansible and set up CI/CD with GitLab (see project README and ansible/).
 
 ---
 
@@ -386,19 +381,6 @@ terraform destroy  # Removes all infrastructure
 
 ---
 
-**Last Updated**: 2025-11-20  
 **Terraform Version**: 1.13.5  
 **GCP Provider**: ~> 5.0
-
----
-
-## 📝 Update Reminder
-
-**This document should be updated:**
-- ✅ When adding new Terraform resources
-- ✅ When changing infrastructure configuration
-- ✅ When discovering new issues or solutions
-- ✅ When updating versions
-
-**Next Update**: After Phase 2 (Ansible) integration
 
